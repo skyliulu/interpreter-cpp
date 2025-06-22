@@ -1,10 +1,12 @@
 #include "token.h"
 #include <vector>
+#include <unordered_map>
 
 class Scanner
 {
 private:
     /* data */
+    static const std::unordered_map<std::string, TokenType> keywords;
     const std::string source;  // The source code to scan
     std::vector<Token> tokens; // The list of tokens generated from the source code
     int start = 0;             // Start index of the current token

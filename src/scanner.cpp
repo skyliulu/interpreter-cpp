@@ -2,6 +2,24 @@
 #include "scanner.h"
 #include "lox.h"
 
+static const std::unordered_map<std::string, TokenType> keywords = {
+    {"and", TokenType::AND},
+    {"class", TokenType::CLASS},
+    {"else", TokenType::ELSE},
+    {"false", TokenType::FALSE},
+    {"for", TokenType::FOR},
+    {"fun", TokenType::FUN},
+    {"if", TokenType::IF},
+    {"nil", TokenType::NIL},
+    {"or", TokenType::OR},
+    {"print", TokenType::PRINT},
+    {"return", TokenType::RETURN},
+    {"super", TokenType::SUPER},
+    {"this", TokenType::THIS},
+    {"true", TokenType::TRUE},
+    {"var", TokenType::VAR},
+    {"while", TokenType::WHILE}};
+
 Scanner::Scanner(const std::string &source) : source(source) {}
 
 Scanner::~Scanner() {}
@@ -145,7 +163,12 @@ void Scanner::identifier()
         advance();
     }
     std::string id = source.substr(start, current - start);
-    add_token(TokenType::IDENTIFIER);
+    TokenType type = TokenType::IDENTIFIER;
+    if (keywords.find(id) != keywords.end())
+    {
+        type = keywords.at(id);
+    }
+    add_token(type);
 }
 
 void Scanner::number()
