@@ -106,6 +106,14 @@ void Scanner::scan_token()
             add_token(TokenType::GREATER);
         }
         break;
+    case ' ':
+    case '\r':
+    case '\t':
+        // Ignore whitespace
+        break;
+    case '\n':
+        line++;
+        break;
     default:
         Lox::error(line, std::string("Unexpected character: ") + ch);
         break;
