@@ -34,6 +34,27 @@ void Scanner::scan_token()
     case '}':
         add_token(TokenType::RIGHT_BRACE);
         break;
+    case ',':
+        add_token(TokenType::COMMA);
+        break;
+    case '.':
+        add_token(TokenType::DOT);
+        break;
+    case '-':
+        add_token(TokenType::MINUS);
+        break;
+    case '+':
+        add_token(TokenType::PLUS);
+        break;
+    case ';':
+        add_token(TokenType::SEMICOLON);
+        break;
+    case '*':
+        add_token(TokenType::STAR);
+        break;
+    case '/':
+        add_token(TokenType::SLASH);
+        break;
     default:
         break;
     }
