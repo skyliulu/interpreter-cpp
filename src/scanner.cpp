@@ -76,6 +76,26 @@ void Scanner::scan_token()
             add_token(TokenType::BANG);
         }
         break;
+    case '<':
+        if (match('='))
+        {
+            add_token(TokenType::LESS_EQUAL);
+        }
+        else
+        {
+            add_token(TokenType::LESS);
+        }
+        break;
+    case '>':
+        if (match('='))
+        {
+            add_token(TokenType::GREATER_EQUAL);
+        }
+        else
+        {
+            add_token(TokenType::GREATER);
+        }
+        break;
     default:
         Lox::error(line, std::string("Unexpected character: ") + ch);
         break;
