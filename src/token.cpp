@@ -1,5 +1,7 @@
 #include "token.h"
 #include <iostream>
+#include <iomanip> // Include for std::fixed, std::setprecision
+#include <limits>  // Include for std::numeric_limits
 
 Token::Token(TokenType t, const std::string &lexeme, const std::optional<Literal> literal, int line)
     : type(t), lexeme(lexeme), literal(literal), line(line) {}
@@ -35,6 +37,21 @@ std::ostream &operator<<(std::ostream &os, const Token &token)
             using T = std::decay_t<decltype(value)>;
             if constexpr (std::is_same_v<T, std::nullptr_t>) {
                 os << "nil"; // Output "nil" for nullptr_t
+            } else if constexpr (std::is_same_v<T, double>) {
+                // Special handling for double: print with fixed precision
+                // Save current stream state
+                std::ios_base::fmtflags original_flags = os.flags();
+                std::streamsize original_precision = os.precision();
+                // Apply desired formatting for double
+                if (value == std::floor(value)) {
+                    // Use std::fixed to ensure decimal point is printed
+                    os << std::fixed << std::setprecision(1) << value;
+                } else {
+                    os << value;
+                }
+                // Restore original stream state
+                os.flags(original_flags);
+                os.precision(original_precision);
             } else {
                 os << value; // Output other types directly (string, double, bool)
             } }, token.get_literal().value());
