@@ -1,4 +1,5 @@
 #include "lox.h"
+#include "scanner.h"
 #include <iostream>
 
 bool Lox::had_error = false;
@@ -9,6 +10,17 @@ Lox::~Lox() {}
 void Lox::run(const std::string &source)
 {
     // Implementation of the run method
+    Scanner scanner(source);
+    std::vector<Token> tokens = scanner.scan_tokens();
+    for (const Token &token : tokens)
+    {
+        std::cout << token << std::endl;
+    }
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+    }
+    return;
 }
 
 void Lox::run_file(const std::string &filename)
