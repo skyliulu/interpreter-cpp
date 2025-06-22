@@ -75,6 +75,7 @@ void Scanner::scan_token()
         {
             add_token(TokenType::BANG);
         }
+        break;
     default:
         Lox::error(line, std::string("Unexpected character: ") + ch);
         break;
