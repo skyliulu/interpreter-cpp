@@ -1,7 +1,7 @@
 #include "token.h"
 #include <iostream>
 #include <iomanip> // Include for std::fixed, std::setprecision
-#include <limits>  // Include for std::numeric_limits
+#include <math.h>
 
 Token::Token(TokenType t, const std::string &lexeme, const std::optional<Literal> literal, int line)
     : type(t), lexeme(lexeme), literal(literal), line(line) {}
