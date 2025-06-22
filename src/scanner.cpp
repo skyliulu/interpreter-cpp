@@ -54,7 +54,17 @@ void Scanner::scan_token()
         add_token(TokenType::STAR);
         break;
     case '/':
-        add_token(TokenType::SLASH);
+        if (match('/'))
+        {
+            while (peek() != '\n' && !is_at_end())
+            {
+                advance(); // Consume the rest of the line
+            }
+        }
+        else
+        {
+            add_token(TokenType::SLASH);
+        }
         break;
     case '=':
         if (match('='))
