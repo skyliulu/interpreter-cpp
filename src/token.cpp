@@ -32,7 +32,7 @@ std::ostream &operator<<(std::ostream &os, const Token &token)
     if (token.get_literal().has_value())
     {
         // Use std::visit to handle the different types in the variant
-        std::visit([&os](const auto &value)
+        std::visit([&os, token](const auto &value)
                    {
             using T = std::decay_t<decltype(value)>;
             if constexpr (std::is_same_v<T, std::nullptr_t>) {
@@ -47,7 +47,7 @@ std::ostream &operator<<(std::ostream &os, const Token &token)
                     // Use std::fixed to ensure decimal point is printed
                     os << std::fixed << std::setprecision(1) << value;
                 } else {
-                    os << value;
+                    os << token.get_lexeme();
                 }
                 // Restore original stream state
                 os.flags(original_flags);
