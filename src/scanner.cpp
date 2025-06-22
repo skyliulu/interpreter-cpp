@@ -119,29 +119,74 @@ void Scanner::scan_token()
         line++;
         break;
     case '"':
-    {
-        std::string string_literal;
-        while (peek() != '"' && !is_at_end())
-        {
-            if (peek() == '\n')
-            {
-                line++;
-            }
-            string_literal += advance();
-        }
-        if (is_at_end())
-        {
-            Lox::error(line, "Unterminated string.");
-            return;
-        }
-        advance(); // Consume the closing quote
-        add_token(TokenType::STRING, string_literal);
-    }
-    break;
-    default:
-        Lox::error(line, std::string("Unexpected character: ") + ch);
+        string();
         break;
+    default:
+        if (isDigit(ch))
+        {
+            number();
+        }
+        else if (isAlpha(ch))
+        {
+            identifier();
+        }
+        else
+        {
+            Lox::error(line, std::string("Unexpected character: ") + ch);
+            break;
+        }
     }
+}
+
+void Scanner::identifier()
+{
+}
+
+void Scanner::number()
+{
+    while (isDigit(peek()) && !is_at_end())
+    {
+        advance();
+    }
+    if (match('.'))
+    {
+        while (isDigit(peek()) && !is_at_end())
+        {
+            advance();
+        }
+    }
+    std::string numberStr = source.substr(start, current - start);
+    double num = std::stod(numberStr);
+    add_token(TokenType::NUMBER, num);
+}
+
+void Scanner::string()
+{
+    while (peek() != '"' && !is_at_end())
+    {
+        if (peek() == '\n')
+        {
+            line++;
+        }
+        advance();
+    }
+    if (is_at_end())
+    {
+        Lox::error(line, "Unterminated string.");
+        return;
+    }
+    advance(); // Consume the closing quote
+    add_token(TokenType::STRING, source.substr(start + 1, current - start - 2));
+}
+
+bool Scanner::isDigit(const char &ch) const
+{
+    return ch >= '0' && ch <= '9';
+}
+
+bool Scanner::isAlpha(const char &ch) const
+{
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
 }
 
 bool Scanner::is_at_end() const
@@ -186,7 +231,7 @@ bool Scanner::match(char expect)
     return true;
 }
 
-void Scanner::add_token(TokenType type, const std::optional<std::string> literal)
+void Scanner::add_token(TokenType type, const std::optional<Literal> literal)
 {
     Token token = Token(type, source.substr(start, current - start), literal, line);
     tokens.push_back(token);

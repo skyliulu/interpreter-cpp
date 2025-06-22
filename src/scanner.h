@@ -12,12 +12,17 @@ private:
     int line = 1;              // Current line number in the source code
     // Helper methods for scanning
     void scan_token();
-    void add_token(TokenType type, const std::optional<std::string> literal = std::nullopt);
+    void add_token(TokenType type, const std::optional<Literal> literal = std::nullopt);
     bool is_at_end() const;
     char advance();
     char peek() const;
     char peek_next() const;
     bool match(char expected);
+    void string();
+    bool isDigit(const char& ch) const;
+    void number();
+    bool isAlpha(const char& ch) const;
+    void identifier();
 
 public:
     Scanner(const std::string &source);

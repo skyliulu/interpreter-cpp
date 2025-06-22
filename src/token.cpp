@@ -1,9 +1,7 @@
-#include <string>
 #include "token.h"
 #include <iostream>
-#include <optional>
 
-Token::Token(TokenType t, const std::string &lexeme, const std::optional<std::string> literal, int line)
+Token::Token(TokenType t, const std::string &lexeme, const std::optional<Literal> literal, int line)
     : type(t), lexeme(lexeme), literal(literal), line(line) {}
 
 Token::~Token() {}
@@ -16,19 +14,35 @@ std::string Token::get_lexeme() const
 {
     return lexeme;
 }
-std::string Token::get_literal() const
+const std::optional<Literal> &Token::get_literal() const
 {
-    return literal.has_value() ? literal.value() : "null";
+    return literal;
 }
 int Token::get_line() const
 {
     return line;
 }
 
-std::ostream & operator<<(std::ostream &os, const Token &token)
+std::ostream &operator<<(std::ostream &os, const Token &token)
 {
     // Output the token type, lexeme, and literal value
-    os << TokentypeToString(token.type) << " " << token.get_lexeme() << " " << token.get_literal();
+    os << TokentypeToString(token.type) << " " << token.get_lexeme() << " ";
+    if (token.get_literal().has_value())
+    {
+        // Use std::visit to handle the different types in the variant
+        std::visit([&os](const auto &value)
+                   {
+            using T = std::decay_t<decltype(value)>;
+            if constexpr (std::is_same_v<T, std::nullptr_t>) {
+                os << "nil"; // Output "nil" for nullptr_t
+            } else {
+                os << value; // Output other types directly (string, double, bool)
+            } }, token.get_literal().value());
+    }
+    else
+    {
+        os << "null";
+    }
     return os;
 }
 

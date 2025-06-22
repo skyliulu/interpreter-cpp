@@ -1,5 +1,6 @@
 #include <string>
 #include <optional>
+#include <variant>
 
 enum TokenType
 {
@@ -52,22 +53,23 @@ enum TokenType
     EOF_TOKEN, // End of file token
 };
 
+using Literal = std::variant<std::string, double, bool, std::nullptr_t>;
+
 class Token
 {
 private:
     /* data */
-    /* data */
     const TokenType type;
     const std::string lexeme;
-    const std::optional<std::string> literal;
+    const std::optional<Literal> literal;
     const int line;
 
 public:
-    Token(TokenType type, const std::string &lexeme, const std::optional<std::string> literal, int line);
+    Token(TokenType type, const std::string &lexeme, const std::optional<Literal> literal, int line);
     ~Token();
     TokenType get_type() const;
     std::string get_lexeme() const;
-    std::string get_literal() const;
+    const std::optional<Literal> &get_literal() const;
     int get_line() const;
     friend std::ostream &operator<<(std::ostream &os, const Token &token);
 };
