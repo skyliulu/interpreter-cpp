@@ -145,7 +145,7 @@ void Scanner::identifier()
         advance();
     }
     std::string id = source.substr(start, current - start);
-    add_token(TokenType::IDENTIFIER, id);
+    add_token(TokenType::IDENTIFIER);
 }
 
 void Scanner::number()
