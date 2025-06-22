@@ -140,6 +140,12 @@ void Scanner::scan_token()
 
 void Scanner::identifier()
 {
+    while (isDigit(peek()) || isAlpha(peek()))
+    {
+        advance();
+    }
+    std::string id = source.substr(start, current - start);
+    add_token(TokenType::IDENTIFIER, id);
 }
 
 void Scanner::number()
