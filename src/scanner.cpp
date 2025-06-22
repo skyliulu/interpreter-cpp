@@ -66,6 +66,15 @@ void Scanner::scan_token()
             add_token(TokenType::EQUAL);
         }
         break;
+    case '!':
+        if (match('='))
+        {
+            add_token(TokenType::BANG_EQUAL);
+        }
+        else
+        {
+            add_token(TokenType::BANG);
+        }
     default:
         Lox::error(line, std::string("Unexpected character: ") + ch);
         break;
