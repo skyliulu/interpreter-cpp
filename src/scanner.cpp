@@ -118,6 +118,26 @@ void Scanner::scan_token()
     case '\n':
         line++;
         break;
+    case '"':
+    {
+        std::string string_literal;
+        while (peek() != '"' && !is_at_end())
+        {
+            if (peek() == '\n')
+            {
+                line++;
+            }
+            string_literal += advance();
+        }
+        if (is_at_end())
+        {
+            Lox::error(line, "Unterminated string.");
+            return;
+        }
+        advance(); // Consume the closing quote
+        add_token(TokenType::STRING, string_literal);
+    }
+    break;
     default:
         Lox::error(line, std::string("Unexpected character: ") + ch);
         break;
