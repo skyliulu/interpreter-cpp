@@ -27,14 +27,6 @@ int main(int argc, char *argv[])
     if (command == "tokenize")
     {
         std::string file_contents = read_file_contents(argv[2]);
-
-        // Uncomment this block to pass the first stage
-
-        if (!file_contents.empty())
-        {
-            std::cerr << "Scanner not implemented" << std::endl;
-            return 1;
-        }
         Scanner scanner = Scanner(file_contents);
         std::vector<Token> tokens = scanner.scan_tokens();
         for (Token &token : tokens)

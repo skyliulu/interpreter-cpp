@@ -12,7 +12,7 @@ private:
     int line = 1;              // Current line number in the source code
     // Helper methods for scanning
     void scan_token();
-    void add_token(Tokentype type, const std::optional<std::string> literal = std::nullopt);
+    void add_token(TokenType type, const std::optional<std::string> literal = std::nullopt);
     bool is_at_end() const;
     char advance();
     char peek() const;

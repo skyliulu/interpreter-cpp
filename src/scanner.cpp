@@ -12,7 +12,7 @@ std::vector<Token> Scanner::scan_tokens()
         start = current;
         scan_token();
     }
-    tokens.push_back(Token(Tokentype::EOF_TOKEN, "", std::nullopt, line));
+    tokens.push_back(Token(TokenType::EOF_TOKEN, "", std::nullopt, line));
     return tokens;
 }
 
@@ -23,10 +23,10 @@ void Scanner::scan_token()
     {
     case '(':
         /* code */
-        add_token(Tokentype::LEFT_PAREN);
+        add_token(TokenType::LEFT_PAREN);
         break;
     case ')':
-        add_token(Tokentype::RIGHT_PAREN);
+        add_token(TokenType::RIGHT_PAREN);
         break;
 
     default:
@@ -76,7 +76,7 @@ bool Scanner::match(char expect)
     return true;
 }
 
-void Scanner::add_token(Tokentype type, const std::optional<std::string> literal = std::nullopt)
+void Scanner::add_token(TokenType type, const std::optional<std::string> literal)
 {
     Token token = Token(type, source.substr(start, current - start), literal, line);
     tokens.push_back(token);
