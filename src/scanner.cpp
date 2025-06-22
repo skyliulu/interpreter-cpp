@@ -56,6 +56,16 @@ void Scanner::scan_token()
     case '/':
         add_token(TokenType::SLASH);
         break;
+    case '=':
+        if (match('='))
+        {
+            add_token(TokenType::EQUAL_EQUAL);
+        }
+        else
+        {
+            add_token(TokenType::EQUAL);
+        }
+        break;
     default:
         Lox::error(line, std::string("Unexpected character: ") + ch);
         break;
