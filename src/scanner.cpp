@@ -1,5 +1,6 @@
 #include <string>
 #include "scanner.h"
+#include "lox.h"
 
 Scanner::Scanner(const std::string &source) : source(source) {}
 
@@ -56,6 +57,7 @@ void Scanner::scan_token()
         add_token(TokenType::SLASH);
         break;
     default:
+        Lox::error(line, std::string("Unexpected character: ") + ch);
         break;
     }
 }
