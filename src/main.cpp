@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "scanner.h"
+#include "lox.h"
 
 std::string read_file_contents(const std::string &filename);
 
@@ -27,12 +27,7 @@ int main(int argc, char *argv[])
     if (command == "tokenize")
     {
         std::string file_contents = read_file_contents(argv[2]);
-        Scanner scanner = Scanner(file_contents);
-        std::vector<Token> tokens = scanner.scan_tokens();
-        for (Token &token : tokens)
-        {
-            std::cout << token << std::endl;
-        }
+        Lox::run(file_contents);
     }
     else
     {
