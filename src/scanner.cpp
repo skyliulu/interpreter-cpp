@@ -2,7 +2,7 @@
 #include "scanner.h"
 #include "lox.h"
 
-static const std::unordered_map<std::string, TokenType> keywords = {
+const std::unordered_map<std::string, TokenType> Scanner::keywords = {
     {"and", TokenType::AND},
     {"class", TokenType::CLASS},
     {"else", TokenType::ELSE},
