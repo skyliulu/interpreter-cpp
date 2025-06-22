@@ -107,7 +107,11 @@ void Scanner::scan_token()
         }
         break;
     case ' ':
+        // Ignore whitespace
+        break;
     case '\r':
+        // Ignore carriage return
+        break;
     case '\t':
         // Ignore whitespace
         break;
