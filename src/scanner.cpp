@@ -28,7 +28,12 @@ void Scanner::scan_token()
     case ')':
         add_token(TokenType::RIGHT_PAREN);
         break;
-
+    case '{':
+        add_token(TokenType::LEFT_BRACE);
+        break;
+    case '}':
+        add_token(TokenType::RIGHT_BRACE);
+        break;
     default:
         break;
     }
