@@ -50,25 +50,25 @@ std::unique_ptr<Expr> Parser::primary()
 {
     if (match({TokenType::FALSE}))
     {
-        return std::make_unique<Expr::Literal>(false);
+        return std::make_unique<Expr::Literal>(previous(), false);
     }
     if (match({TokenType::TRUE}))
     {
-        return std::make_unique<Expr::Literal>(true);
+        return std::make_unique<Expr::Literal>(previous(), true);
     }
     if (match({TokenType::NIL}))
     {
-        return std::make_unique<Expr::Literal>(nullptr);
+        return std::make_unique<Expr::Literal>(previous(), nullptr);
     }
     if (match({TokenType::NUMBER}))
     {
         Token token = previous();
-        return std::make_unique<Expr::Literal>(token.get_literal().value_or(0.0));
+        return std::make_unique<Expr::Literal>(token, token.get_literal().value_or(0.0));
     }
     if (match({TokenType::STRING}))
     {
         Token token = previous();
-        return std::make_unique<Expr::Literal>(token.get_literal().value_or(""));
+        return std::make_unique<Expr::Literal>(token, token.get_literal().value_or(""));
     }
     if (match({TokenType::LEFT_PAREN}))
     {

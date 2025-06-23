@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <iomanip>
+#include <math.h>
 #include "expr.h"
 
 class AstPrinter : public Expr::Visitor
@@ -45,7 +47,18 @@ public:
         }
         else if (std::holds_alternative<double>(expr.get_value()))
         {
-            std::cout << std::get<double>(expr.get_value());
+            double value = std::get<double>(expr.get_value());
+            // Print double with fixed precision
+            if(value == std::floor(value))
+            {
+                // If the value is an integer, print it with one decimal place
+                std::cout << std::fixed << std::setprecision(1) << value;
+            }
+            else
+            {
+                // Otherwise, print it as is
+                std::cout << expr.get_keyword().get_lexeme();
+            }
         }
         else if (std::holds_alternative<bool>(expr.get_value()))
         {

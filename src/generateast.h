@@ -18,7 +18,12 @@ void define_visitor(std::ofstream &out, const std::string &className, const std:
 void generate_ast()
 {
     std::string outputDir = "src";
-    define_ast(outputDir, "Expr", {"Binary : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right", "Unary : Token operator_, std::unique_ptr<Expr> right", "Literal : LiteralToken value", "Grouping : std::unique_ptr<Expr> expression"});
+    define_ast(outputDir, "Expr", {
+        "Binary : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right", 
+        "Unary : Token operator_, std::unique_ptr<Expr> right", 
+        "Literal : Token keyword, LiteralToken value", 
+        "Grouping : std::unique_ptr<Expr> expression"
+    });
 }
 
 void define_ast(const std::string &outputDir, const std::string &className, const std::vector<std::string> &fields)
