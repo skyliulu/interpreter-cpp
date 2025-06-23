@@ -82,7 +82,7 @@ std::unique_ptr<Expr> Parser::primary()
 
 bool Parser::is_at_end()
 {
-    return current >= tokens.size();
+    return peek().get_type() == TokenType::EOF_TOKEN;
 }
 
 bool Parser::check(TokenType type)

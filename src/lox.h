@@ -9,6 +9,8 @@ private:
 public:
     Lox(/* args */);
     ~Lox();
+    static void tokenize(const std::string &source); // Method to tokenize the source code
+    static void parse(const std::string &source); // Method to parse the source code
     static void run(const std::string &source); // Method to run the Lox interpreter with the given source code
     static void run_file(const std::string &filename); // Method to run a Lox file
     static void run_prompt(); // Method to run the Lox interpreter in prompt mode

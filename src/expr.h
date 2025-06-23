@@ -1,7 +1,6 @@
 #pragma once
-#include <memory>
 #include "token.h"
-
+#include <memory>
 class Expr
 {
 public:
@@ -11,13 +10,18 @@ public:
 	class Unary ;
 	class Literal ;
 	class Grouping ;
-	template <typename T>
 	class Visitor;
-	template <typename T>
-	T accept(Visitor<T> &visitor)
-	{
-		return visitor.visit(*this);
-	};
+	virtual void accept(Visitor &visitor) const = 0;
+};
+
+class Expr::Visitor
+{
+public:
+    virtual ~Visitor() = default;
+	virtual void visit(const Binary  &expr) = 0;
+	virtual void visit(const Unary  &expr) = 0;
+	virtual void visit(const Literal  &expr) = 0;
+	virtual void visit(const Grouping  &expr) = 0;
 };
 
 class Expr::Binary  : public Expr
@@ -34,6 +38,10 @@ public:
 	Expr* get_left() const { return left.get(); }
 	Token get_operator_() const { return operator_; }
 	Expr* get_right() const { return right.get(); }
+	void accept(Visitor &visitor) const override
+	{
+		visitor.visit(*this);
+	}
 };
 
 class Expr::Unary  : public Expr
@@ -48,6 +56,10 @@ public:
 	~Unary () {}
 	Token get_operator_() const { return operator_; }
 	Expr* get_right() const { return right.get(); }
+	void accept(Visitor &visitor) const override
+	{
+		visitor.visit(*this);
+	}
 };
 
 class Expr::Literal  : public Expr
@@ -60,6 +72,10 @@ public:
 	}
 	~Literal () {}
 	LiteralToken get_value() const { return value; }
+	void accept(Visitor &visitor) const override
+	{
+		visitor.visit(*this);
+	}
 };
 
 class Expr::Grouping  : public Expr
@@ -72,15 +88,9 @@ public:
 	}
 	~Grouping () {}
 	Expr* get_expression() const { return expression.get(); }
+	void accept(Visitor &visitor) const override
+	{
+		visitor.visit(*this);
+	}
 };
 
-template <typename T>
-class Expr::Visitor
-{
-public:
-    virtual ~Visitor() = default;
-	virtual T visit(Binary  &expr) = 0;
-	virtual T visit(Unary  &expr) = 0;
-	virtual T visit(Literal  &expr) = 0;
-	virtual T visit(Grouping  &expr) = 0;
-};

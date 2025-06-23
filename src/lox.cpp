@@ -1,11 +1,57 @@
 #include "lox.h"
 #include "scanner.h"
+#include "parser.h"
+#include "astprinter.h"
 #include <iostream>
 
 bool Lox::had_error = false;
 
 Lox::Lox(/* args */) {}
 Lox::~Lox() {}
+
+void Lox::tokenize(const std::string &source)
+{
+    // Implementation of the run method
+    Scanner scanner(source);
+    std::vector<Token> tokens = scanner.scan_tokens();
+    for (const Token &token : tokens)
+    {
+        std::cout << token << std::endl;
+    }
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+    }
+    return;
+}
+
+void Lox::parse(const std::string &source)
+{
+    // Implementation of the parse method
+    Scanner scanner(source);
+    std::vector<Token> tokens = scanner.scan_tokens();
+    for (const Token &token : tokens)
+    {
+        std::cout << token << std::endl;
+    }
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+    }
+    
+    Parser parser(tokens);
+    std::vector<std::unique_ptr<Expr>> expressions = parser.parse();
+    AstPrinter printer;
+    for (const auto &expr : expressions)
+    {
+        expr->accept(printer);
+        std::cout << std::endl;
+    }
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+    }
+}
 
 void Lox::run(const std::string &source)
 {

@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     if (command == "tokenize")
     {
         std::string file_contents = read_file_contents(argv[2]);
-        Lox::run(file_contents);
+        Lox::tokenize(file_contents);
     }
     else if (command == "generate_ast")
     {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     else if (command == "parse")
     {
         std::string file_contents = read_file_contents(argv[2]);
-        Lox::run(file_contents);
+        Lox::parse(file_contents);
     }
     else
     {

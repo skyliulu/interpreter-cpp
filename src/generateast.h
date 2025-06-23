@@ -18,12 +18,7 @@ void define_visitor(std::ofstream &out, const std::string &className, const std:
 void generate_ast()
 {
     std::string outputDir = "src";
-    define_ast(outputDir, "Expr", {
-        "Binary : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right", 
-        "Unary : Token operator_, std::unique_ptr<Expr> right", 
-        "Literal : LiteralToken value", 
-        "Grouping : std::unique_ptr<Expr> expression"
-    });
+    define_ast(outputDir, "Expr", {"Binary : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right", "Unary : Token operator_, std::unique_ptr<Expr> right", "Literal : LiteralToken value", "Grouping : std::unique_ptr<Expr> expression"});
 }
 
 void define_ast(const std::string &outputDir, const std::string &className, const std::vector<std::string> &fields)
@@ -36,7 +31,7 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
     }
 
     out << "#pragma once\n";
-    out << "#include <token.h>\n";
+    out << "#include \"token.h\"\n";
     out << "#include <memory>\n";
     out << "class " << className << "\n{\npublic:\n";
     out << "\t" << className << "() {}\n";
@@ -55,15 +50,12 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
         }
     }
 
-    out << "\ttemplate <typename T>\n";
     out << "\tclass Visitor;\n";
-
-    out << "\ttemplate <typename T>\n";
-    out << "\tT accept(Visitor<T> &visitor)\n";
-    out << "\t{\n";
-    out << "\t\treturn visitor.visit(*this);\n";
-    out << "\t};\n";
+    out << "\tvirtual void accept(Visitor &visitor) const = 0;\n";
     out << "};\n";
+    out << "\n";
+    
+    define_visitor(out, className, nestedClasses);
     out << "\n";
 
     for (const auto &field : fields)
@@ -78,8 +70,6 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
             out << "\n";
         }
     }
-
-    define_visitor(out, className, nestedClasses);
 
     out.close();
 }
@@ -141,17 +131,22 @@ void define_type(std::ofstream &out, const std::string &baseClass, const std::st
         out << "\t" << fieldType << " " << fieldMethod << "() const { return " << fieldName << "; }\n";
     }
 
+    // accept method
+    out << "\tvoid accept(Visitor &visitor) const override\n";
+    out << "\t{\n";
+    out << "\t\tvisitor.visit(*this);\n";
+    out << "\t}\n";
+
     out << "};\n";
 }
 
 void define_visitor(std::ofstream &out, const std::string &className, const std::vector<std::string> &types)
 {
-    out << "template <typename T>\n";
     out << "class " << className << "::Visitor\n{\npublic:\n";
     out << "    virtual ~Visitor() = default;\n";
     for (const auto &name : types)
     {
-        out << "\tvirtual T visit(" << name << " &expr) = 0;\n";
+        out << "\tvirtual void visit(const " << name << " &expr) = 0;\n";
     }
     out << "};\n";
 }
