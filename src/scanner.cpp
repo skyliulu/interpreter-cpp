@@ -31,7 +31,7 @@ std::vector<Token> Scanner::scan_tokens()
         start = current;
         scan_token();
     }
-    tokens.push_back(Token(TokenType::EOF_TOKEN, "", std::nullopt, line));
+    tokens.emplace_back(TokenType::EOF_TOKEN, "", std::nullopt, line);
     return tokens;
 }
 
@@ -260,8 +260,7 @@ bool Scanner::match(char expect)
     return true;
 }
 
-void Scanner::add_token(TokenType type, const std::optional<Literal> literal)
+void Scanner::add_token(TokenType type, const std::optional<LiteralToken> literal)
 {
-    Token token = Token(type, source.substr(start, current - start), literal, line);
-    tokens.push_back(token);
+    tokens.emplace_back(type, source.substr(start, current - start), literal, line);
 }

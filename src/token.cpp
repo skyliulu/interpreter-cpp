@@ -3,7 +3,7 @@
 #include <iomanip> // Include for std::fixed, std::setprecision
 #include <math.h>
 
-Token::Token(TokenType t, const std::string &lexeme, const std::optional<Literal> literal, int line)
+Token::Token(TokenType t, const std::string &lexeme, const std::optional<LiteralToken> literal, int line)
     : type(t), lexeme(lexeme), literal(literal), line(line) {}
 
 Token::~Token() {}
@@ -16,7 +16,7 @@ std::string Token::get_lexeme() const
 {
     return lexeme;
 }
-const std::optional<Literal> &Token::get_literal() const
+const std::optional<LiteralToken> &Token::get_literal() const
 {
     return literal;
 }

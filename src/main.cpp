@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include "lox.h"
+#include "generateast.h"
 
 std::string read_file_contents(const std::string &filename);
 
@@ -16,7 +17,7 @@ int main(int argc, char *argv[])
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     std::cerr << "Logs from your program will appear here!" << std::endl;
 
-    if (argc < 3)
+    if (argc < 2)
     {
         std::cerr << "Usage: ./your_program tokenize <filename>" << std::endl;
         return 1;
@@ -25,6 +26,17 @@ int main(int argc, char *argv[])
     const std::string command = argv[1];
 
     if (command == "tokenize")
+    {
+        std::string file_contents = read_file_contents(argv[2]);
+        Lox::run(file_contents);
+    }
+    else if (command == "generate_ast")
+    {
+        // Assuming generate_ast is a function that generates the AST
+        // You might need to include the appropriate header file for this function
+        generate_ast();
+    }
+    else if (command == "parse")
     {
         std::string file_contents = read_file_contents(argv[2]);
         Lox::run(file_contents);

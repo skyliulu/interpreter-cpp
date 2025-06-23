@@ -43,3 +43,16 @@ void Lox::error(int line, const std::string &message)
     report(line, "", message);
     had_error = true;
 }
+
+void Lox::error(const Token &token, const std::string &message)
+{
+    if (token.get_type() == TokenType::EOF_TOKEN)
+    {
+        report(token.get_line(), " at end", message);
+    }
+    else
+    {
+        report(token.get_line(), " at '" + token.get_lexeme() + "'", message);
+    }
+    had_error = true;
+}

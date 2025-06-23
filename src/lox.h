@@ -1,4 +1,5 @@
 #include <string>
+#include "token.h"
 
 class Lox
 {
@@ -13,4 +14,6 @@ public:
     static void run_prompt(); // Method to run the Lox interpreter in prompt mode
     static void report(int line, const std::string &where, const std::string &message); // Method to report errors
     static void error(int line, const std::string &message); // Method to handle errors
+    static void error(const Token &token, const std::string &message); // Method to handle errors with a token
+ 
 };
