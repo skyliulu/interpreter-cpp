@@ -180,7 +180,7 @@ void Interpreter::check_number_operand(const Token &operator_, const std::any &o
 {
     if (operand.type() != typeid(double))
     {
-        throw RuntimeError(operator_, "Operand must be a number'");
+        throw RuntimeError(operator_, "Operand must be a number");
     }
 }
 

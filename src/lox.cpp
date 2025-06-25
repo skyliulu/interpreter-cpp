@@ -88,6 +88,7 @@ void Lox::evaluate(const std::string &source)
     }
     if (had_runtime_error)
     {
+        exit(70); // Exit with a runtime error code if there was a runtime error
         return;
     }
 }
