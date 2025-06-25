@@ -20,6 +20,7 @@ std::vector<std::unique_ptr<Expr>> Parser::parse()
     catch (const ParserError &e)
     {
         synchronize(); // Attempt to recover from the error
+        return {}; // Return an empty vector if parsing fails
     }
 }
 

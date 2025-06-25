@@ -37,13 +37,16 @@ void Lox::parse(const std::string &source)
     if (had_error)
     {
         exit(65); // Exit with an error code if there was an error
+        return;
     }
 
     Parser parser(tokens);
     std::vector<std::unique_ptr<Expr>> expressions = parser.parse();
     if (had_error)
     {
+        // std::cerr << "Parsing failed with errors." << std::endl;
         exit(65); // Exit with an error code if there was an error
+        return;
     }
     AstPrinter printer;
     for (const auto &expr : expressions)
