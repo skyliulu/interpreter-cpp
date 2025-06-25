@@ -1,7 +1,4 @@
 #include "lox.h"
-#include "scanner.h"
-#include "parser.h"
-#include "astprinter.h"
 #include <iostream>
 
 bool Lox::had_error = false;
@@ -53,6 +50,36 @@ void Lox::parse(const std::string &source)
     {
         expr->accept(printer);
         std::cout << std::endl;
+    }
+}
+
+void Lox::evaluate(const std::string &source)
+{
+    // Implementation of the evaluate method
+    Scanner scanner(source);
+    std::vector<Token> tokens = scanner.scan_tokens();
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+        return;
+    }
+
+    Parser parser(tokens);
+    std::vector<std::unique_ptr<Expr>> expressions = parser.parse();
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+        return;
+    }
+    Interpreter interpreter;
+    for (const auto &expr : expressions)
+    {
+        interpreter.interpret(*expr);
+    }
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+        return;
     }
 }
 

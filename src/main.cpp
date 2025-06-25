@@ -41,6 +41,11 @@ int main(int argc, char *argv[])
         std::string file_contents = read_file_contents(argv[2]);
         Lox::parse(file_contents);
     }
+    else if (command == "evaluate")
+    {
+        std::string file_contents = read_file_contents(argv[2]);
+        Lox::evaluate(file_contents);
+    }
     else
     {
         std::cerr << "Unknown command: " << command << std::endl;
