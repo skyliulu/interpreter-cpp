@@ -112,13 +112,7 @@ std::string Interpreter::stringify(const std::any &value)
     }
     else if (value.type() == typeid(double))
     {
-        double num = std::any_cast<double>(value);
-        // Check if the number is an integer
-        if (num == static_cast<int>(num))
-        {
-            return std::to_string(static_cast<int>(num)) + ".0"; // Ensure it ends with .0
-        }
-        return std::to_string(num);
+        return double_to_string(std::any_cast<double>(value));
     }
     else if (value.type() == typeid(std::string))
     {

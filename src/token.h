@@ -75,4 +75,5 @@ private:
     const int line;
 };
 
-std::string TokentypeToString(TokenType type);
+std::string tokentype_to_string(TokenType type);
+std::string double_to_string(double value);
