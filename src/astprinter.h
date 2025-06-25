@@ -56,8 +56,20 @@ public:
             }
             else
             {
+                std::string s = expr.get_keyword().get_lexeme();
+                // Remove trailing zeros and the decimal point if it becomes an integer
+                // Find the decimal point
+                size_t dot_pos = s.find('.');
+                if (dot_pos != std::string::npos) {
+                    // Remove trailing zeros
+                    s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+                    // If the last character is now the decimal point, remove it
+                    if (s.back() == '.') {
+                        s.pop_back();
+                    }
+                }
                 // Otherwise, print it as is
-                std::cout << expr.get_keyword().get_lexeme();
+                std::cout << s;
             }
         }
         else if (std::holds_alternative<bool>(expr.get_value()))
