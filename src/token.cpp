@@ -38,20 +38,38 @@ std::ostream &operator<<(std::ostream &os, const Token &token)
             if constexpr (std::is_same_v<T, std::nullptr_t>) {
                 os << "nil"; // Output "nil" for nullptr_t
             } else if constexpr (std::is_same_v<T, double>) {
-                // Special handling for double: print with fixed precision
-                // Save current stream state
-                std::ios_base::fmtflags original_flags = os.flags();
-                std::streamsize original_precision = os.precision();
-                // Apply desired formatting for double
-                if (value == std::floor(value)) {
-                    // Use std::fixed to ensure decimal point is printed
-                    os << std::fixed << std::setprecision(1) << value;
-                } else {
-                    os << token.get_lexeme();
+                                // Convert double to string
+                std::string s = std::to_string(value);
+                // Remove trailing zeros and the decimal point if it becomes an integer
+                // Find the decimal point
+                size_t dot_pos = s.find('.');
+                if (dot_pos != std::string::npos) {
+                    // Remove trailing zeros
+                    s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+                    // If the last character is now the decimal point, remove it
+                    if (s.back() == '.') {
+                        s.pop_back();
+                    }
                 }
-                // Restore original stream state
-                os.flags(original_flags);
-                os.precision(original_precision);
+
+                // Special case: if the original value was an integer (like 123.0),
+                // and after removing trailing zeros it became "123", we need to add ".0" back.
+                // This check is needed because std::to_string(123.0) might produce "123.000000"
+                // and the above logic would make it "123".
+                // A simple check is to see if the original double value is equal to its floor.
+                if (value == std::floor(value) && dot_pos != std::string::npos) {
+                     // If it was originally an integer and had a decimal point in the string representation,
+                     // ensure it ends with .0
+                     if (s.find('.') == std::string::npos) {
+                         s += ".0";
+                     } else {
+                         // If it still has a decimal point but no digit after it (e.g., "123."), add a zero
+                         if (s.back() == '.') {
+                             s += '0';
+                         }
+                     }
+                }
+                os << s; // Output the formatted double
             } else {
                 os << value; // Output other types directly (string, double, bool)
             } }, token.get_literal().value());
