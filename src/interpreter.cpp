@@ -22,8 +22,16 @@ std::any Interpreter::visit(const Expr::Binary &expr)
     switch (expr.get_operator_().get_type())
     {
     case PLUS:
-        check_number_operands(expr.get_operator_(), left, right);
-        return std::any_cast<double>(left) + std::any_cast<double>(right);
+        if (left.type() == typeid(std::string) || right.type() == typeid(std::string))
+        {
+            // If either operand is a string, concatenate them
+            return stringify(left) + stringify(right);
+        }
+        if (left.type() == typeid(double) && right.type() == typeid(double))
+        {
+            return std::any_cast<double>(left) + std::any_cast<double>(right);
+        }
+        throw RuntimeError(expr.get_operator_(), "Operands must be two numbers or two strings for '+' operator");
     case MINUS:
         check_number_operands(expr.get_operator_(), left, right);
         return std::any_cast<double>(left) - std::any_cast<double>(right);
