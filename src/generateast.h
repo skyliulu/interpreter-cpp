@@ -1,9 +1,9 @@
+#pragma once
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#pragma once
 
 std::string to_lower(std::string s);
 

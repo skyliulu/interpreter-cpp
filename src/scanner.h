@@ -1,3 +1,4 @@
+#pragma once
 #include "token.h"
 #include <vector>
 #include <unordered_map>

@@ -1,10 +1,9 @@
+#pragma once
 #include <string>
 #include "token.h"
 #include "parser.h"
-#include "scanner.h"
 #include "astprinter.h"
 #include "interpreter.h"
-#include "generateast.h"
 
 class Lox
 {

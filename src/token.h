@@ -1,7 +1,7 @@
+#pragma once
 #include <string>
 #include <optional>
 #include <variant>
-#pragma once
 
 enum TokenType
 {

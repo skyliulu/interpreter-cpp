@@ -1,4 +1,5 @@
 #include "lox.h"
+#include "scanner.h"
 #include <iostream>
 
 bool Lox::had_error = false;
