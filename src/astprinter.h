@@ -72,7 +72,7 @@ public:
 
     void visit(const Expr::Grouping &expr) override
     {
-        std::cout << "(group";
+        std::cout << "(group ";
         expr.get_expression()->accept(*this);
         std::cout << ")";
     }
