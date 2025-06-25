@@ -15,6 +15,7 @@ private:
     bool is_truthy(const std::any &value);
     void check_number_operand(const Token &operator_, const std::any &operand);
     void check_number_operands(const Token &operator_, const std::any &left, const std::any &right);
+    bool equality(const std::any &left, const std::any &right);
 
 public:
     Interpreter(/* args */);

@@ -58,9 +58,9 @@ std::any Interpreter::visit(const Expr::Binary &expr)
         check_number_operands(expr.get_operator_(), left, right);
         return std::any_cast<double>(left) <= std::any_cast<double>(right);
     case EQUAL_EQUAL:
-        return is_truthy(left) == is_truthy(right);
+        return equality(left, right);
     case BANG_EQUAL:
-        return is_truthy(left) != is_truthy(right);
+        return !equality(left, right);
     }
 }
 
@@ -144,6 +144,27 @@ bool Interpreter::is_truthy(const std::any &value)
         return std::any_cast<bool>(value); // true or false
     }
     return true; // All other values are considered true
+}
+
+bool Interpreter::equality(const std::any &left, const std::any &right)
+{
+    if (left.type() != right.type())
+    {
+        return false; // Different types cannot be equal
+    }
+    if (left.type() == typeid(double))
+    {
+        return std::any_cast<double>(left) == std::any_cast<double>(right);
+    }
+    else if (left.type() == typeid(std::string))
+    {
+        return std::any_cast<std::string>(left) == std::any_cast<std::string>(right);
+    }
+    else if (left.type() == typeid(bool))
+    {
+        return std::any_cast<bool>(left) == std::any_cast<bool>(right);
+    }
+    return false; // For other types, consider them not equal
 }
 
 void Interpreter::check_number_operand(const Token &operator_, const std::any &operand)
