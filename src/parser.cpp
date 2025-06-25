@@ -18,7 +18,7 @@ std::vector<std::unique_ptr<Expr>> Parser::parse()
 
 std::unique_ptr<Expr> Parser::expresstion()
 {
-    return comparison();
+    return equality();
 }
 
 std::unique_ptr<Expr> Parser::equality()
