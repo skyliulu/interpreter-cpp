@@ -1,4 +1,5 @@
 #include "interpreter.h"
+#include "lox.h"
 
 Interpreter::Interpreter(/* args */) {}
 
@@ -6,8 +7,16 @@ Interpreter::~Interpreter() {}
 
 void Interpreter::interpret(const Expr &expr)
 {
-    std::any result = evaluate(expr);
-    std::cout << stringify(result) << std::endl;
+    try
+    {
+        std::any result = evaluate(expr);
+        std::cout << stringify(result) << std::endl;
+    }
+    catch (const RuntimeError &error)
+    {
+        Lox::runtime_error(error);
+        return; // Exit early if there is a runtime error
+    }
 }
 
 std::any Interpreter::evaluate(const Expr &expr)

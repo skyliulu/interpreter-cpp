@@ -10,6 +10,7 @@ class Lox
 private:
     /* data */
     static bool had_error; // Flag to indicate if an error has occurred
+    static bool had_runtime_error; // Flag to indicate if a runtime error has occurred
 public:
     Lox(/* args */);
     ~Lox();
@@ -22,5 +23,6 @@ public:
     static void report(int line, const std::string &where, const std::string &message); // Method to report errors
     static void error(int line, const std::string &message); // Method to handle errors
     static void error(const Token &token, const std::string &message); // Method to handle errors with a token
+    static void runtime_error(const RuntimeError &error); // Method to handle runtime errors
  
 };

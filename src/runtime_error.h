@@ -7,7 +7,7 @@ class RuntimeError : public std::runtime_error
 {
 public:
     RuntimeError(const Token &token, const std::string &message)
-        : std::runtime_error("Runtime Error at line " + std::to_string(token.get_line()) + ": " + message), token(token) {}
+        : std::runtime_error(message), token(token) {}
 
     Token get_token() const
     {

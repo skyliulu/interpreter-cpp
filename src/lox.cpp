@@ -3,6 +3,7 @@
 #include <iostream>
 
 bool Lox::had_error = false;
+bool Lox::had_runtime_error = false;
 
 Lox::Lox(/* args */) {}
 Lox::~Lox() {}
@@ -85,9 +86,8 @@ void Lox::evaluate(const std::string &source)
     {
         interpreter.interpret(*expr);
     }
-    if (had_error)
+    if (had_runtime_error)
     {
-        exit(65); // Exit with an error code if there was an error
         return;
     }
 }
@@ -140,4 +140,10 @@ void Lox::error(const Token &token, const std::string &message)
         report(token.get_line(), " at '" + token.get_lexeme() + "'", message);
     }
     had_error = true;
+}
+
+void Lox::runtime_error(const RuntimeError &error)
+{
+    std::cerr << error.what() << " [line " << error.get_token().get_line() << "]" << std::endl;
+    had_runtime_error = true;
 }
