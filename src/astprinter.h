@@ -25,18 +25,18 @@ public:
 
     void visit(const Expr::Binary &expr) override
     {
-        std::cout << "(" << " " << expr.get_operator_().get_lexeme() << " ";
+        std::cout << "(" << expr.get_operator_().get_lexeme() << " ";
         expr.get_left()->accept(*this);
         std::cout << " ";
         expr.get_right()->accept(*this);
-        std::cout << " )";
+        std::cout << ")";
     }
 
     void visit(const Expr::Unary &expr) override
     {
         std::cout << "(" << expr.get_operator_().get_lexeme() << " ";
         expr.get_right()->accept(*this);
-        std::cout << " )";
+        std::cout << ")";
     }
 
     void visit(const Expr::Literal &expr) override
