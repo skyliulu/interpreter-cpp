@@ -18,14 +18,28 @@ std::vector<std::unique_ptr<Expr>> Parser::parse()
 
 std::unique_ptr<Expr> Parser::expresstion()
 {
-    return binary();
+    return term();
 }
 
-std::unique_ptr<Expr> Parser::binary()
+std::unique_ptr<Expr> Parser::term()
+{
+    std::unique_ptr<Expr> left = factor();
+
+    while (match({TokenType::PLUS, TokenType::MINUS}))
+    {
+        Token operator_ = previous();
+        std::unique_ptr<Expr> right = factor();
+        left = std::make_unique<Expr::Binary>(std::move(left), operator_, std::move(right));
+    }
+
+    return left;
+}
+
+std::unique_ptr<Expr> Parser::factor()
 {
     std::unique_ptr<Expr> left = unary();
 
-    while (match({TokenType::PLUS, TokenType::MINUS, TokenType::STAR, TokenType::SLASH}))
+    while (match({TokenType::STAR, TokenType::SLASH}))
     {
         Token operator_ = previous();
         std::unique_ptr<Expr> right = unary();

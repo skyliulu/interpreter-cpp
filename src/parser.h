@@ -28,10 +28,15 @@ private:
     int current;               // Current position in the token list
     /* parse expr */
     std::unique_ptr<Expr> expresstion();
-    std::unique_ptr<Expr> primary();
+    // factor (("+" | "-") factor)*
+    std::unique_ptr<Expr> term();
+    // unary (("*" | "/") unary ）*
+    std::unique_ptr<Expr> factor();
+    // ("-" | "!") expr
     std::unique_ptr<Expr> unary();
-    std::unique_ptr<Expr> binary();
-    std::unique_ptr<Expr> grouping();
+    // true | false | nuil | number | string | identifier | "(" expr ")""
+    std::unique_ptr<Expr> primary();
+
     /* helper functions */
     bool is_at_end();
     bool check(TokenType type);
