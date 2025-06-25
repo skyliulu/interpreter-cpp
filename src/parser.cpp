@@ -21,6 +21,20 @@ std::unique_ptr<Expr> Parser::expresstion()
     return comparison();
 }
 
+std::unique_ptr<Expr> Parser::equality()
+{
+    std::unique_ptr<Expr> left = comparison();
+
+    while (match({TokenType::EQUAL_EQUAL, TokenType::BANG_EQUAL}))
+    {
+        Token operator_ = previous();
+        std::unique_ptr<Expr> right = comparison();
+        left = std::make_unique<Expr::Binary>(std::move(left), operator_, std::move(right));
+    }
+
+    return left;
+}
+
 std::unique_ptr<Expr> Parser::comparison()
 {
     std::unique_ptr<Expr> left = term();
