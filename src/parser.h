@@ -28,6 +28,8 @@ private:
     int current;               // Current position in the token list
     /* parse expr */
     std::unique_ptr<Expr> expresstion();
+    // term ((< | <= | > | >=) term)*
+    std::unique_ptr<Expr> comparison();
     // factor (("+" | "-") factor)*
     std::unique_ptr<Expr> term();
     // unary (("*" | "/") unary ）*

@@ -18,7 +18,21 @@ std::vector<std::unique_ptr<Expr>> Parser::parse()
 
 std::unique_ptr<Expr> Parser::expresstion()
 {
-    return term();
+    return comparison();
+}
+
+std::unique_ptr<Expr> Parser::comparison()
+{
+    std::unique_ptr<Expr> left = term();
+
+    while (match({TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL}))
+    {
+        Token operator_ = previous();
+        std::unique_ptr<Expr> right = term();
+        left = std::make_unique<Expr::Binary>(std::move(left), operator_, std::move(right));
+    }
+
+    return left;
 }
 
 std::unique_ptr<Expr> Parser::term()
