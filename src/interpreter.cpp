@@ -74,7 +74,29 @@ std::any Interpreter::visit(const Expr::Unary &expr)
 std::any Interpreter::visit(const Expr::Literal &expr)
 {
     // Directly return the value stored in the Literal expression
-    return expr.get_value();
+    std::any value = expr.get_value();
+    if (value.type() != typeid(LiteralToken))
+    {
+        return nullptr; // Return nil
+    }
+    LiteralToken v = std::any_cast<LiteralToken>(value);
+
+    if (const std::string *str = std::get_if<std::string>(&v))
+    {
+        return *str; // Return the string value
+    }
+    else if (const double *num = std::get_if<double>(&v))
+    {
+        return *num; // Return the double value
+    }
+    else if (const bool *boolean = std::get_if<bool>(&v))
+    {
+        return *boolean; // Return the boolean value
+    }
+    else
+    {
+        return nullptr; // Return nil
+    }
 }
 
 std::any Interpreter::visit(const Expr::Grouping &expr)
@@ -101,6 +123,10 @@ std::string Interpreter::stringify(const std::any &value)
     else if (value.type() == typeid(std::string))
     {
         return std::any_cast<std::string>(value);
+    }
+    else if (value.type() == typeid(bool))
+    {
+        return std::any_cast<bool>(value) ? "true" : "false";
     }
     return "unknown";
 }
