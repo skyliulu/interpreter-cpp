@@ -76,4 +76,4 @@ private:
 };
 
 std::string tokentype_to_string(TokenType type);
-std::string double_to_string(double value);
+std::string double_to_string(double value, bool with_trailing_zero = true);

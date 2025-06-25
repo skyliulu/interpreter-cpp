@@ -112,7 +112,7 @@ std::string Interpreter::stringify(const std::any &value)
     }
     else if (value.type() == typeid(double))
     {
-        return double_to_string(std::any_cast<double>(value));
+        return double_to_string(std::any_cast<double>(value), false);
     }
     else if (value.type() == typeid(std::string))
     {

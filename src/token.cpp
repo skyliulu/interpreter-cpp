@@ -50,7 +50,7 @@ std::ostream &operator<<(std::ostream &os, const Token &token)
     return os;
 }
 
-std::string double_to_string(double value)
+std::string double_to_string(double value, bool with_trailing_zero)
 {
     std::string s = std::to_string(value);
     // Remove trailing zeros and the decimal point if it becomes an integer
@@ -72,7 +72,7 @@ std::string double_to_string(double value)
     // This check is needed because std::to_string(123.0) might produce "123.000000"
     // and the above logic would make it "123".
     // A simple check is to see if the original double value is equal to its floor.
-    if (value == std::floor(value) && dot_pos != std::string::npos)
+    if (value == std::floor(value) && with_trailing_zero && dot_pos != std::string::npos)
     {
         // If it was originally an integer and had a decimal point in the string representation,
         // ensure it ends with .0
