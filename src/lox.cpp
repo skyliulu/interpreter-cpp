@@ -68,12 +68,12 @@ void Lox::evaluate(const std::string &source)
     Parser parser(tokens);
     std::vector<std::unique_ptr<Expr>> expressions = parser.parse();
     
-    AstPrinter printer;
-    for (const auto &expr : expressions)
-    {
-        expr->accept(printer);
-        std::cout << std::endl;
-    }
+    // AstPrinter printer;
+    // for (const auto &expr : expressions)
+    // {
+    //     expr->accept(printer);
+    //     std::cout << std::endl;
+    // }
 
     if (had_error)
     {
