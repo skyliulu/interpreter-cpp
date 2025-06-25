@@ -23,23 +23,25 @@ public:
         }
     }
 
-    void visit(const Expr::Binary &expr) override
+    std::any visit(const Expr::Binary &expr) override
     {
         std::cout << "(" << expr.get_operator_().get_lexeme() << " ";
         expr.get_left()->accept(*this);
         std::cout << " ";
         expr.get_right()->accept(*this);
         std::cout << ")";
+        return std::any(); // Return an empty std::any as the return type is std::any
     }
 
-    void visit(const Expr::Unary &expr) override
+    std::any visit(const Expr::Unary &expr) override
     {
         std::cout << "(" << expr.get_operator_().get_lexeme() << " ";
         expr.get_right()->accept(*this);
         std::cout << ")";
+        return std::any(); 
     }
 
-    void visit(const Expr::Literal &expr) override
+    std::any visit(const Expr::Literal &expr) override
     {
         if (std::holds_alternative<std::string>(expr.get_value()))
         {
@@ -80,13 +82,15 @@ public:
         {
             std::cout << "nil";
         }
+        return std::any(); 
     }
 
-    void visit(const Expr::Grouping &expr) override
+    std::any visit(const Expr::Grouping &expr) override
     {
         std::cout << "(group ";
         expr.get_expression()->accept(*this);
         std::cout << ")";
+        return std::any(); 
     }
 
 };

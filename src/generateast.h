@@ -38,6 +38,7 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
     out << "#pragma once\n";
     out << "#include \"token.h\"\n";
     out << "#include <memory>\n";
+    out << "#include <any>\n";
     out << "class " << className << "\n{\npublic:\n";
     out << "\t" << className << "() {}\n";
     out << "\t~" << className << "() {}\n";
@@ -56,7 +57,7 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
     }
 
     out << "\tclass Visitor;\n";
-    out << "\tvirtual void accept(Visitor &visitor) const = 0;\n";
+    out << "\tvirtual std::any accept(Visitor &visitor) const = 0;\n";
     out << "};\n";
     out << "\n";
     
@@ -137,9 +138,9 @@ void define_type(std::ofstream &out, const std::string &baseClass, const std::st
     }
 
     // accept method
-    out << "\tvoid accept(Visitor &visitor) const override\n";
+    out << "\tstd::any accept(Visitor &visitor) const override\n";
     out << "\t{\n";
-    out << "\t\tvisitor.visit(*this);\n";
+    out << "\t\treturn visitor.visit(*this);\n";
     out << "\t}\n";
 
     out << "};\n";
@@ -151,7 +152,7 @@ void define_visitor(std::ofstream &out, const std::string &className, const std:
     out << "    virtual ~Visitor() = default;\n";
     for (const auto &name : types)
     {
-        out << "\tvirtual void visit(const " << name << " &expr) = 0;\n";
+        out << "\tvirtual std::any visit(const " << name << " &expr) = 0;\n";
     }
     out << "};\n";
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "token.h"
 #include <memory>
+#include <any>
 class Expr
 {
 public:
@@ -11,17 +12,17 @@ public:
 	class Literal ;
 	class Grouping ;
 	class Visitor;
-	virtual void accept(Visitor &visitor) const = 0;
+	virtual std::any accept(Visitor &visitor) const = 0;
 };
 
 class Expr::Visitor
 {
 public:
     virtual ~Visitor() = default;
-	virtual void visit(const Binary  &expr) = 0;
-	virtual void visit(const Unary  &expr) = 0;
-	virtual void visit(const Literal  &expr) = 0;
-	virtual void visit(const Grouping  &expr) = 0;
+	virtual std::any visit(const Binary  &expr) = 0;
+	virtual std::any visit(const Unary  &expr) = 0;
+	virtual std::any visit(const Literal  &expr) = 0;
+	virtual std::any visit(const Grouping  &expr) = 0;
 };
 
 class Expr::Binary  : public Expr
@@ -38,9 +39,9 @@ public:
 	Expr* get_left() const { return left.get(); }
 	Token get_operator_() const { return operator_; }
 	Expr* get_right() const { return right.get(); }
-	void accept(Visitor &visitor) const override
+	std::any accept(Visitor &visitor) const override
 	{
-		visitor.visit(*this);
+		return visitor.visit(*this);
 	}
 };
 
@@ -56,9 +57,9 @@ public:
 	~Unary () {}
 	Token get_operator_() const { return operator_; }
 	Expr* get_right() const { return right.get(); }
-	void accept(Visitor &visitor) const override
+	std::any accept(Visitor &visitor) const override
 	{
-		visitor.visit(*this);
+		return visitor.visit(*this);
 	}
 };
 
@@ -74,9 +75,9 @@ public:
 	~Literal () {}
 	Token get_keyword() const { return keyword; }
 	LiteralToken get_value() const { return value; }
-	void accept(Visitor &visitor) const override
+	std::any accept(Visitor &visitor) const override
 	{
-		visitor.visit(*this);
+		return visitor.visit(*this);
 	}
 };
 
@@ -90,9 +91,9 @@ public:
 	}
 	~Grouping () {}
 	Expr* get_expression() const { return expression.get(); }
-	void accept(Visitor &visitor) const override
+	std::any accept(Visitor &visitor) const override
 	{
-		visitor.visit(*this);
+		return visitor.visit(*this);
 	}
 };
 
