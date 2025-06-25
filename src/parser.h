@@ -51,6 +51,7 @@ private:
     Token consume(TokenType type, const std::string &message);
     bool match(const std::vector<TokenType> &types);
     ParserError error(Token token, const std::string &message);
+    void synchronize();
 
 public:
     Parser(const std::vector<Token> &tokens);

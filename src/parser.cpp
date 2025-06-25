@@ -8,12 +8,19 @@ Parser::~Parser() {}
 
 std::vector<std::unique_ptr<Expr>> Parser::parse()
 {
-    std::vector<std::unique_ptr<Expr>> expressions;
-    while (!is_at_end())
+    try
     {
-        expressions.push_back(expresstion());
+        std::vector<std::unique_ptr<Expr>> expressions;
+        while (!is_at_end())
+        {
+            expressions.push_back(expresstion());
+        }
+        return expressions;
     }
-    return expressions;
+    catch (const ParserError &e)
+    {
+        synchronize(); // Attempt to recover from the error
+    }
 }
 
 std::unique_ptr<Expr> Parser::expresstion()
@@ -185,4 +192,30 @@ Token Parser::consume(TokenType type, const std::string &message)
         return advance();
     }
     throw error(peek(), message);
+}
+
+void Parser::synchronize()
+{
+    advance();
+    while (!is_at_end())
+    {
+        if (previous().get_type() == TokenType::SEMICOLON)
+            return;
+
+        switch (peek().get_type())
+        {
+        case TokenType::CLASS:
+        case TokenType::FUN:
+        case TokenType::VAR:
+        case TokenType::FOR:
+        case TokenType::IF:
+        case TokenType::WHILE:
+        case TokenType::PRINT:
+        case TokenType::RETURN:
+            return;
+        default:
+            break;
+        }
+        advance();
+    }
 }
