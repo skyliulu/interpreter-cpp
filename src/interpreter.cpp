@@ -31,10 +31,9 @@ std::any Interpreter::visit(const Expr::Binary &expr)
     switch (expr.get_operator_().get_type())
     {
     case PLUS:
-        if (left.type() == typeid(std::string) || right.type() == typeid(std::string))
+        if (left.type() == typeid(std::string) && right.type() == typeid(std::string))
         {
-            // If either operand is a string, concatenate them
-            return stringify(left) + stringify(right);
+            return  std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
         }
         if (left.type() == typeid(double) && right.type() == typeid(double))
         {
