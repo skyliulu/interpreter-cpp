@@ -47,7 +47,7 @@ std::any Interpreter::evaluate(const Expr &expr)
 std::any Interpreter::visit(const Stmt::Block &expr)
 {
     Environment previous = environment; // Save the current environment
-    environment = Environment(previous);          // Create a new environment for the block
+    environment = Environment(&previous);          // Create a new environment for the block
     try
     {
         for (const auto &statement : expr.get_statements())
