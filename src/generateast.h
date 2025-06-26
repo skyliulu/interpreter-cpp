@@ -25,12 +25,15 @@ void generate_ast()
         "Grouping : std::unique_ptr<Expr> expression",
         "Variable : Token name",
         "Assign : Token name, std::unique_ptr<Expr> value",
+        "Logical : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right",
     });
     define_ast(outputDir, "Stmt", {
         "Expression : std::unique_ptr<Expr> expression", 
         "Print : std::unique_ptr<Expr> expression",
         "Var : Token name, std::unique_ptr<Expr> initializer",
         "Block : std::vector<std::unique_ptr<Stmt>> statements",
+        "If : std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, std::unique_ptr<Stmt> elseBranch",
+        "While : std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body",
     });
 }
 

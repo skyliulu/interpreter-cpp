@@ -68,6 +68,39 @@ public:
         return std::any(); // Return an empty std::any as the return type is std::any
     }
 
+    std::any visit(const Stmt::If &expr) override
+    {
+        std::cout << "if (";
+        expr.get_condition()->accept(*this);
+        std::cout << ") ";
+        expr.get_thenBranch()->accept(*this);
+        if (expr.get_elseBranch())
+        {
+            std::cout << " else ";
+            expr.get_elseBranch()->accept(*this);
+        }
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+
+    std::any visit(const Stmt::While &expr) override
+    {
+        std::cout << "while (";
+        expr.get_condition()->accept(*this);
+        std::cout << ") ";
+        expr.get_body()->accept(*this);
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+
+    std::any visit(const Expr::Logical &expr) override
+    {
+        std::cout << "(" << expr.get_operator_().get_lexeme() << " ";
+        expr.get_left()->accept(*this);
+        std::cout << " ";
+        expr.get_right()->accept(*this);
+        std::cout << ")";
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+
     std::any visit(const Expr::Assign &expr) override
     {
         std::cout << expr.get_name().get_lexeme() << " = ";

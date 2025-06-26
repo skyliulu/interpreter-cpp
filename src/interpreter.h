@@ -30,6 +30,8 @@ public:
     std::any visit(const Stmt::Print &expr) override;
     std::any visit(const Stmt::Var &expr) override;
     std::any visit(const Stmt::Block &expr) override;
+    std::any visit(const Stmt::If &expr) override;
+    std::any visit(const Stmt::While &expr) override;
     // expr visitor methods
     std::any visit(const Expr::Binary &expr) override;
     std::any visit(const Expr::Unary &expr) override;
@@ -37,4 +39,5 @@ public:
     std::any visit(const Expr::Grouping &expr) override;
     std::any visit(const Expr::Variable &expr) override;
     std::any visit(const Expr::Assign &expr) override;
+    std::any visit(const Expr::Logical &expr) override;
 };

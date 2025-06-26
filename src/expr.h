@@ -13,6 +13,7 @@ public:
 	class Grouping ;
 	class Variable ;
 	class Assign ;
+	class Logical ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -27,6 +28,7 @@ public:
 	virtual std::any visit(const Grouping  &expr) = 0;
 	virtual std::any visit(const Variable  &expr) = 0;
 	virtual std::any visit(const Assign  &expr) = 0;
+	virtual std::any visit(const Logical  &expr) = 0;
 };
 
 class Expr::Binary  : public Expr
@@ -129,6 +131,26 @@ public:
 	~Assign () {}
 	Token get_name() const { return name; }
 	Expr* get_value() const { return value.get(); }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Expr::Logical  : public Expr
+{
+private:
+	std::unique_ptr<Expr> left;
+	Token operator_;
+	std::unique_ptr<Expr> right;
+public:
+	Logical (std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right) : left(std::move(left)), operator_(operator_), right(std::move(right))
+	{
+	}
+	~Logical () {}
+	Expr* get_left() const { return left.get(); }
+	Token get_operator_() const { return operator_; }
+	Expr* get_right() const { return right.get(); }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);

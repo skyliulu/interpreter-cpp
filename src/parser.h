@@ -29,8 +29,12 @@ private:
     int current;               // Current position in the token list
     /* parse expr */
     std::unique_ptr<Expr> expresstion();
-    // assignment
+    // Identifier "=" assignment | logical_or
     std::unique_ptr<Expr> assignment();
+    // logical_and ("or" logical_and)*
+    std::unique_ptr<Expr> logical_or();
+    // equality ("and" equality)*
+    std::unique_ptr<Expr> logical_and();
     // comparison (("==" | "!=") comparison)*
     std::unique_ptr<Expr> equality();
     // term ((< | <= | > | >=) term)*
@@ -44,16 +48,20 @@ private:
     // true | false | nuil | number | string | identifier | "(" expr ")""
     std::unique_ptr<Expr> primary();
     /* parse stmt */
-    // exprStmt | printStmt | varStmt | block
+    // exprStmt | printStmt | varStmt | block | ifStmt | whileStmt
     std::unique_ptr<Stmt> statement();
-    // printStmt
+    // "print" expr ";"
     std::unique_ptr<Stmt> print_stmt();
-    // exprStmt
+    // expr ";"
     std::unique_ptr<Stmt> expression_stmt();
-    // varStmt
+    // "var" IDENTIFIER ("=" expr)? ";"
     std::unique_ptr<Stmt> var_stmt();
-    // block
+    // "{" stmt* "}"
     std::unique_ptr<Stmt> block_stmt();
+    // "if" "(" expr ")" stmt ("else" stmt)?
+    std::unique_ptr<Stmt> if_stmt();
+    // "while" "(" expr ")" stmt
+    std::unique_ptr<Stmt> while_stmt();
 
     /* helper functions */
     bool is_at_end();

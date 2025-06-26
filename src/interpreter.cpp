@@ -46,19 +46,19 @@ std::any Interpreter::evaluate(const Expr &expr)
 
 std::any Interpreter::visit(const Stmt::Block &expr)
 {
-    Environment previous = environment; // Save the current environment
-    environment = Environment(&previous);          // Create a new environment for the block
+    Environment previous = environment;   // Save the current environment
+    environment = Environment(&previous); // Create a new environment for the block
     try
     {
         for (const auto &statement : expr.get_statements())
         {
-            execute(*statement); 
+            execute(*statement);
         }
     }
     catch (const RuntimeError &e)
     {
         environment = previous; // Restore the previous environment on error
-        throw e;                  // Re-throw the error
+        throw e;                // Re-throw the error
     }
     environment = previous; // Restore the previous environment after execution
     return std::any();      // Return an empty std::any as the return type is std::any
@@ -89,6 +89,49 @@ std::any Interpreter::visit(const Stmt::Var &expr)
     }
     environment.define(expr.get_name().get_lexeme(), value); // Define the variable in the environment
     return value;                                            // Return the initialized value
+}
+
+std::any Interpreter::visit(const Stmt::While &expr)
+{
+    while (is_truthy(evaluate(*(expr.get_condition())))) // Continue while the condition is true
+    {
+        execute(*(expr.get_body())); // Execute the body of the loop
+    }
+    return std::any(); // Return an empty std::any as the return type is std::any
+}
+
+std::any Interpreter::visit(const Stmt::If &expr)
+{
+    std::any condition = evaluate(*(expr.get_condition()));
+    if (is_truthy(condition))
+    {
+        execute(*(expr.get_thenBranch())); // Execute the then branch if condition is true
+    }
+    else if (expr.get_elseBranch())
+    {
+        execute(*(expr.get_elseBranch())); // Execute the else branch if it exists
+    }
+    return std::any(); // Return an empty std::any as the return type is std::any
+}
+
+std::any Interpreter::visit(const Expr::Logical &expr)
+{
+    std::any left = evaluate(*(expr.get_left()));
+    if (expr.get_operator_().get_type() == TokenType::OR)
+    {
+        if (is_truthy(left))
+        {
+            return left; // Short-circuit evaluation for OR
+        }
+    }
+    else if (expr.get_operator_().get_type() == TokenType::AND)
+    {
+        if (!is_truthy(left))
+        {
+            return left; // Short-circuit evaluation for AND
+        }
+    }
+    return evaluate(*(expr.get_right())); // Evaluate the right side if necessary
 }
 
 std::any Interpreter::visit(const Expr::Variable &expr)
