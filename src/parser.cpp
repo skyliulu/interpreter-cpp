@@ -26,20 +26,46 @@ std::vector<std::unique_ptr<Expr>> Parser::parse_expr()
 
 std::vector<std::unique_ptr<Stmt>> Parser::parse()
 {
+
+    std::vector<std::unique_ptr<Stmt>> stmts;
+    while (!is_at_end())
+    {
+        stmts.push_back(declaration());
+    }
+    return stmts;
+}
+
+std::unique_ptr<Stmt> Parser::declaration()
+{
     try
     {
-        std::vector<std::unique_ptr<Stmt>> stmts;
-        while (!is_at_end())
+        if (match({TokenType::VAR}))
         {
-            stmts.push_back(statement());
+            return var_decl();
         }
-        return stmts;
+        return statement();
     }
     catch (const ParserError &e)
     {
-        synchronize(); // Attempt to recover from the error
-        return {};     // Return an empty vector if parsing fails
+        synchronize();
+        return {};
     }
+}
+
+std::unique_ptr<Stmt> Parser::var_decl()
+{
+    Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
+    std::unique_ptr<Expr> initializer;
+    if (match({TokenType::EQUAL}))
+    {
+        initializer = expresstion();
+    }
+    else
+    {
+        initializer = nullptr;
+    }
+    consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
+    return std::make_unique<Stmt::Var>(name, std::move(initializer));
 }
 
 std::unique_ptr<Stmt> Parser::statement()
@@ -47,10 +73,6 @@ std::unique_ptr<Stmt> Parser::statement()
     if (match({TokenType::PRINT}))
     {
         return print_stmt();
-    }
-    else if (match({TokenType::VAR}))
-    {
-        return var_stmt();
     }
     else if (match({TokenType::LEFT_BRACE}))
     {
@@ -64,7 +86,7 @@ std::unique_ptr<Stmt> Parser::statement()
     {
         return while_stmt();
     }
-    else if(match({TokenType::FOR}))
+    else if (match({TokenType::FOR}))
     {
         return for_stmt();
     }
@@ -78,7 +100,7 @@ std::unique_ptr<Stmt> Parser::for_stmt()
 
     if (match({TokenType::VAR}))
     {
-        initializer = var_stmt();
+        initializer = var_decl();
     }
     else if (match({TokenType::SEMICOLON}))
     {
@@ -166,22 +188,6 @@ std::unique_ptr<Stmt> Parser::block_stmt()
     }
     consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
     return std::make_unique<Stmt::Block>(std::move(statements));
-}
-
-std::unique_ptr<Stmt> Parser::var_stmt()
-{
-    Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
-    std::unique_ptr<Expr> initializer;
-    if (match({TokenType::EQUAL}))
-    {
-        initializer = expresstion();
-    }
-    else
-    {
-        initializer = nullptr;
-    }
-    consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
-    return std::make_unique<Stmt::Var>(name, std::move(initializer));
 }
 
 std::unique_ptr<Stmt> Parser::print_stmt()

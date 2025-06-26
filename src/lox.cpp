@@ -109,6 +109,9 @@ void Lox::run(const std::string &source)
         exit(65); // Exit with an error code if there was an error
         return;
     }
+    AstPrinter printer;
+    printer.print(statements);
+    
     Interpreter interpreter;
     interpreter.interpret(statements);
     if (had_runtime_error)
