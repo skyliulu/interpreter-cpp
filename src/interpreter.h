@@ -4,12 +4,13 @@
 #include <vector>
 #include "stmt.h"
 #include "runtime_error.h"
+#include "environment.h"
 
 class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
 private:
     /* data */
-
+    Environment environment; // The environment to store variable values
     /* helper functions */
     void execute(const Stmt &stmt);
     std::any evaluate(const Expr &expr);
@@ -27,9 +28,12 @@ public:
     // stmt visitor methods
     std::any visit(const Stmt::Expression &expr) override;
     std::any visit(const Stmt::Print &expr) override;
+    std::any visit(const Stmt::Var &expr) override;
     // expr visitor methods
     std::any visit(const Expr::Binary &expr) override;
     std::any visit(const Expr::Unary &expr) override;
     std::any visit(const Expr::Literal &expr) override;
     std::any visit(const Expr::Grouping &expr) override;
+    std::any visit(const Expr::Variable &expr) override;
+    std::any visit(const Expr::Assign &expr) override;
 };

@@ -32,16 +32,40 @@ public:
         }
     }
 
+    std::any visit(const Stmt::Var &expr) override
+    {
+        std::cout << "var " << expr.get_name().get_lexeme();
+        if (expr.get_initializer())
+        {
+            std::cout << " = ";
+            expr.get_initializer()->accept(*this);
+        }
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+
     std::any visit(const Stmt::Expression &expr) override
     {
         expr.get_expression()->accept(*this);
         return std::any(); // Return an empty std::any as the return type is std::any
     }
-    
+
     std::any visit(const Stmt::Print &expr) override
     {
         std::cout << "print ";
         expr.get_expression()->accept(*this);
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+
+    std::any visit(const Expr::Assign &expr) override
+    {
+        std::cout << expr.get_name().get_lexeme() << " = ";
+        expr.get_value()->accept(*this);
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+
+    std::any visit(const Expr::Variable &expr) override
+    {
+        std::cout << expr.get_name().get_lexeme();
         return std::any(); // Return an empty std::any as the return type is std::any
     }
 

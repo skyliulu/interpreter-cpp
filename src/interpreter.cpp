@@ -44,7 +44,6 @@ std::any Interpreter::evaluate(const Expr &expr)
     return expr.accept(*this);
 }
 
-
 std::any Interpreter::visit(const Stmt::Expression &expr)
 {
     return evaluate(*(expr.get_expression()));
@@ -55,6 +54,33 @@ std::any Interpreter::visit(const Stmt::Print &expr)
     std::any value = evaluate(*(expr.get_expression()));
     std::cout << stringify(value) << std::endl;
     return value; // Return the value for potential further use
+}
+
+std::any Interpreter::visit(const Stmt::Var &expr)
+{
+    std::any value;
+    if (expr.get_initializer())
+    {
+        value = evaluate(*(expr.get_initializer()));
+    }
+    else
+    {
+        value = nullptr; // If no initializer, set to nil
+    }
+    environment.define(expr.get_name().get_lexeme(), value); // Define the variable in the environment
+    return value;                                            // Return the initialized value
+}
+
+std::any Interpreter::visit(const Expr::Variable &expr)
+{
+    return environment.get(expr.get_name());
+}
+
+std::any Interpreter::visit(const Expr::Assign &expr)
+{
+    std::any value = evaluate(*(expr.get_value()));
+    environment.assign(expr.get_name(), value);
+    return value;
 }
 
 std::any Interpreter::visit(const Expr::Binary &expr)

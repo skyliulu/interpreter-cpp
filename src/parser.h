@@ -29,6 +29,8 @@ private:
     int current;               // Current position in the token list
     /* parse expr */
     std::unique_ptr<Expr> expresstion();
+    // assignment
+    std::unique_ptr<Expr> assignment();
     // comparison (("==" | "!=") comparison)*
     std::unique_ptr<Expr> equality();
     // term ((< | <= | > | >=) term)*
@@ -42,12 +44,14 @@ private:
     // true | false | nuil | number | string | identifier | "(" expr ")""
     std::unique_ptr<Expr> primary();
     /* parse stmt */
-    // exprStmt | printStmt
+    // exprStmt | printStmt | varStmt | block
     std::unique_ptr<Stmt> statement();
     // printStmt
     std::unique_ptr<Stmt> print_stmt();
     // exprStmt
     std::unique_ptr<Stmt> expression_stmt();
+    // varStmt
+    std::unique_ptr<Stmt> var_stmt();
 
     /* helper functions */
     bool is_at_end();

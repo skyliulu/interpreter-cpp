@@ -9,6 +9,7 @@ public:
 	~Stmt() {}
 	class Expression ;
 	class Print ;
+	class Var ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -19,6 +20,7 @@ public:
     virtual ~Visitor() = default;
 	virtual std::any visit(const Expression  &expr) = 0;
 	virtual std::any visit(const Print  &expr) = 0;
+	virtual std::any visit(const Var  &expr) = 0;
 };
 
 class Stmt::Expression  : public Stmt
@@ -47,6 +49,24 @@ public:
 	}
 	~Print () {}
 	Expr* get_expression() const { return expression.get(); }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Stmt::Var  : public Stmt
+{
+private:
+	Token name;
+	std::unique_ptr<Expr> initializer;
+public:
+	Var (Token name, std::unique_ptr<Expr> initializer) : name(name), initializer(std::move(initializer))
+	{
+	}
+	~Var () {}
+	Token get_name() const { return name; }
+	Expr* get_initializer() const { return initializer.get(); }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);
