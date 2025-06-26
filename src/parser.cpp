@@ -64,6 +64,10 @@ std::unique_ptr<Stmt> Parser::statement()
     {
         return while_stmt();
     }
+    else if(match({TokenType::FOR}))
+    {
+        return for_stmt();
+    }
     return expression_stmt();
 }
 
