@@ -48,7 +48,7 @@ private:
     // true | false | nuil | number | string | identifier | "(" expr ")""
     std::unique_ptr<Expr> primary();
     /* parse stmt */
-    // exprStmt | printStmt | varStmt | block | ifStmt | whileStmt
+    // exprStmt | printStmt | varStmt | block | ifStmt | whileStmt | forStmt
     std::unique_ptr<Stmt> statement();
     // "print" expr ";"
     std::unique_ptr<Stmt> print_stmt();
@@ -62,6 +62,8 @@ private:
     std::unique_ptr<Stmt> if_stmt();
     // "while" "(" expr ")" stmt
     std::unique_ptr<Stmt> while_stmt();
+    // "for" "(" (varStmt | exprStmt)? ";" expr? ";" expr? ")" stmt
+    std::unique_ptr<Stmt> for_stmt();
 
     /* helper functions */
     bool is_at_end();

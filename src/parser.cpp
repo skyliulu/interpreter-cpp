@@ -67,6 +67,68 @@ std::unique_ptr<Stmt> Parser::statement()
     return expression_stmt();
 }
 
+std::unique_ptr<Stmt> Parser::for_stmt()
+{
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
+    std::unique_ptr<Stmt> initializer;
+
+    if (match({TokenType::VAR}))
+    {
+        initializer = var_stmt();
+    }
+    else if (match({TokenType::SEMICOLON}))
+    {
+        initializer = nullptr;
+    }
+    else
+    {
+        initializer = expression_stmt();
+    }
+
+    std::unique_ptr<Expr> condition = nullptr;
+    if (!check(TokenType::SEMICOLON))
+    {
+        condition = expresstion();
+    }
+    consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
+
+    std::unique_ptr<Expr> increment = nullptr;
+    if (!check(TokenType::RIGHT_PAREN))
+    {
+        increment = expresstion();
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    std::unique_ptr<Stmt> body = statement();
+
+    if (increment)
+    {
+        std::vector<std::unique_ptr<Stmt>> block_stmts;
+        block_stmts.push_back(std::move(body));
+        block_stmts.push_back(std::make_unique<Stmt::Expression>(std::move(increment)));
+        body = std::make_unique<Stmt::Block>(std::move(block_stmts));
+    }
+
+    if (!condition)
+    {
+        condition = std::make_unique<Expr::Literal>(true);
+    }
+
+    std::unique_ptr<Stmt> while_stmt = std::make_unique<Stmt::While>(std::move(condition), std::move(body));
+
+    if (initializer)
+    {
+        std::vector<std::unique_ptr<Stmt>> block_stmts;
+        block_stmts.push_back(std::move(initializer));
+        block_stmts.push_back(std::move(while_stmt));
+        return std::make_unique<Stmt::Block>(std::move(block_stmts));
+    }
+    else
+    {
+        return while_stmt;
+    }
+}
+
 std::unique_ptr<Stmt> Parser::while_stmt()
 {
     consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
@@ -254,25 +316,25 @@ std::unique_ptr<Expr> Parser::primary()
 {
     if (match({TokenType::FALSE}))
     {
-        return std::make_unique<Expr::Literal>(previous(), false);
+        return std::make_unique<Expr::Literal>(false);
     }
     if (match({TokenType::TRUE}))
     {
-        return std::make_unique<Expr::Literal>(previous(), true);
+        return std::make_unique<Expr::Literal>(true);
     }
     if (match({TokenType::NIL}))
     {
-        return std::make_unique<Expr::Literal>(previous(), nullptr);
+        return std::make_unique<Expr::Literal>(nullptr);
     }
     if (match({TokenType::NUMBER}))
     {
         Token token = previous();
-        return std::make_unique<Expr::Literal>(token, token.get_literal().value_or(0.0));
+        return std::make_unique<Expr::Literal>(token.get_literal().value_or(0.0));
     }
     if (match({TokenType::STRING}))
     {
         Token token = previous();
-        return std::make_unique<Expr::Literal>(token, token.get_literal().value_or(""));
+        return std::make_unique<Expr::Literal>(token.get_literal().value_or(""));
     }
     if (match({TokenType::LEFT_PAREN}))
     {

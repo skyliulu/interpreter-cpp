@@ -72,14 +72,12 @@ public:
 class Expr::Literal  : public Expr
 {
 private:
-	Token keyword;
 	LiteralToken value;
 public:
-	Literal (Token keyword, LiteralToken value) : keyword(keyword), value(value)
+	Literal (LiteralToken value) : value(value)
 	{
 	}
 	~Literal () {}
-	Token get_keyword() const { return keyword; }
 	LiteralToken get_value() const { return value; }
 	std::any accept(Visitor &visitor) const override
 	{

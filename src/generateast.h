@@ -21,7 +21,7 @@ void generate_ast()
     define_ast(outputDir, "Expr", {
         "Binary : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right", 
         "Unary : Token operator_, std::unique_ptr<Expr> right", 
-        "Literal : Token keyword, LiteralToken value", 
+        "Literal : LiteralToken value", 
         "Grouping : std::unique_ptr<Expr> expression",
         "Variable : Token name",
         "Assign : Token name, std::unique_ptr<Expr> value",
