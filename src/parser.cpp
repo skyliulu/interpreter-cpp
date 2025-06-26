@@ -184,7 +184,7 @@ std::unique_ptr<Stmt> Parser::block_stmt()
     std::vector<std::unique_ptr<Stmt>> statements;
     while (!is_at_end() && !check(TokenType::RIGHT_BRACE))
     {
-        statements.push_back(statement());
+        statements.push_back(declaration());
     }
     consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
     return std::make_unique<Stmt::Block>(std::move(statements));
