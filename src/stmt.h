@@ -10,6 +10,7 @@ public:
 	class Expression ;
 	class Print ;
 	class Var ;
+	class Block ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -21,6 +22,7 @@ public:
 	virtual std::any visit(const Expression  &expr) = 0;
 	virtual std::any visit(const Print  &expr) = 0;
 	virtual std::any visit(const Var  &expr) = 0;
+	virtual std::any visit(const Block  &expr) = 0;
 };
 
 class Stmt::Expression  : public Stmt
@@ -67,6 +69,22 @@ public:
 	~Var () {}
 	Token get_name() const { return name; }
 	Expr* get_initializer() const { return initializer.get(); }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Stmt::Block  : public Stmt
+{
+private:
+	std::vector<std::unique_ptr<Stmt>> statements;
+public:
+	Block (std::vector<std::unique_ptr<Stmt>> statements) : statements(std::move(statements))
+	{
+	}
+	~Block () {}
+	const std::vector<std::unique_ptr<Stmt>>& get_statements() const { return statements; }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);

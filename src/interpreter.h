@@ -29,6 +29,7 @@ public:
     std::any visit(const Stmt::Expression &expr) override;
     std::any visit(const Stmt::Print &expr) override;
     std::any visit(const Stmt::Var &expr) override;
+    std::any visit(const Stmt::Block &expr) override;
     // expr visitor methods
     std::any visit(const Expr::Binary &expr) override;
     std::any visit(const Expr::Unary &expr) override;

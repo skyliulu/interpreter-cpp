@@ -52,6 +52,8 @@ private:
     std::unique_ptr<Stmt> expression_stmt();
     // varStmt
     std::unique_ptr<Stmt> var_stmt();
+    // block
+    std::unique_ptr<Stmt> block_stmt();
 
     /* helper functions */
     bool is_at_end();

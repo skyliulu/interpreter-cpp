@@ -10,8 +10,9 @@ class Environment
 private:
     /* data */
     std::unordered_map<std::string, std::any> values; // Store variable names and their values
+    Environment *enclosing = nullptr;                 // Pointer to the enclosing environment for nested scopes
 public:
-    Environment(/* args */) {}
+    Environment(Environment *enclosing=nullptr) : enclosing(enclosing) {}
     ~Environment() {}
     void define(const std::string &name, const std::any &value)
     {
@@ -24,10 +25,11 @@ public:
         {
             it->second = value; // Update the value of the variable
         }
-        else
+        if (enclosing) // If there is an enclosing environment
         {
-            throw RuntimeError(token, "Undefined variable '" + token.get_lexeme() + "'."); // Throw an error if the variable is not defined
+            enclosing->assign(token, value); // Try to assign in the enclosing environment
         }
+        throw RuntimeError(token, "Undefined variable '" + token.get_lexeme() + "'."); // Throw an error if the variable is not defined
     }
     std::any get(const Token &token) const
     {
@@ -35,6 +37,10 @@ public:
         if (it != values.end())
         {
             return it->second; // Return the value of the variable
+        }
+        if (enclosing)
+        {
+            return enclosing->get(token); // Try to get the variable from the enclosing environment
         }
         throw RuntimeError(token, "Undefined variable '" + token.get_lexeme() + "'."); // Throw an error if the variable is not defined
     }

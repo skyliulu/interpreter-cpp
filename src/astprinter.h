@@ -32,6 +32,18 @@ public:
         }
     }
 
+    std::any visit(const Stmt::Block &expr) override
+    {
+        std::cout << "{\n";
+        for (const auto &statement : expr.get_statements())
+        {
+            statement->accept(*this);
+            std::cout << "\n";
+        }
+        std::cout << "}";
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+
     std::any visit(const Stmt::Var &expr) override
     {
         std::cout << "var " << expr.get_name().get_lexeme();

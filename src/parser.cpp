@@ -52,7 +52,22 @@ std::unique_ptr<Stmt> Parser::statement()
     {
         return var_stmt();
     }
+    else if (match({TokenType::LEFT_BRACE}))
+    {
+        return block_stmt();
+    }
     return expression_stmt();
+}
+
+std::unique_ptr<Stmt> Parser::block_stmt()
+{
+    std::vector<std::unique_ptr<Stmt>> statements;
+    while (!is_at_end() && !check(TokenType::RIGHT_BRACE))
+    {
+        statements.push_back(statement());
+    }
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
+    return std::make_unique<Stmt::Block>(std::move(statements));
 }
 
 std::unique_ptr<Stmt> Parser::var_stmt()

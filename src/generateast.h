@@ -30,6 +30,7 @@ void generate_ast()
         "Expression : std::unique_ptr<Expr> expression", 
         "Print : std::unique_ptr<Expr> expression",
         "Var : Token name, std::unique_ptr<Expr> initializer",
+        "Block : std::vector<std::unique_ptr<Stmt>> statements",
     });
 }
 
@@ -143,11 +144,17 @@ void define_type(std::ofstream &out, const std::string &baseClass, const std::st
         std::string fieldType = field.substr(0, field.find(' '));
         std::string fieldName = field.substr(field.find(' ') + 1);
         std::string fieldMethod = "get_" + fieldName;
-        if (fieldType.find("std::unique_ptr") != std::string::npos)
+        if (fieldType.find("std::unique_ptr") == 0)
         {
             fieldType = fieldType.substr(16, fieldType.size() - 17) + "*"; // Remove "std::unique_ptr<" and ">"
             fieldName = fieldName + ".get()";                              // For unique_ptr, we return the raw pointer
         }
+        else if(fieldType.find("std::vector") == 0)
+        {
+            fieldType = "const " + fieldType + "&"; // Remove "std::vector<" and ">"
+        } 
+        
+        
         out << "\t" << fieldType << " " << fieldMethod << "() const { return " << fieldName << "; }\n";
     }
 

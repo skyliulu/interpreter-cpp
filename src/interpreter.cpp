@@ -44,6 +44,26 @@ std::any Interpreter::evaluate(const Expr &expr)
     return expr.accept(*this);
 }
 
+std::any Interpreter::visit(const Stmt::Block &expr)
+{
+    Environment previous = environment; // Save the current environment
+    environment = Environment(previous);          // Create a new environment for the block
+    try
+    {
+        for (const auto &statement : expr.get_statements())
+        {
+            execute(*statement); 
+        }
+    }
+    catch (const RuntimeError &e)
+    {
+        environment = previous; // Restore the previous environment on error
+        throw e;                  // Re-throw the error
+    }
+    environment = previous; // Restore the previous environment after execution
+    return std::any();      // Return an empty std::any as the return type is std::any
+}
+
 std::any Interpreter::visit(const Stmt::Expression &expr)
 {
     return evaluate(*(expr.get_expression()));
