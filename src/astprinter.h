@@ -6,7 +6,7 @@
 #include <math.h>
 #include "expr.h"
 
-class AstPrinter : public Expr::Visitor
+class AstPrinter : public Expr::Visitor, public Stmt::Visitor
 {
 private:
     /* data */
@@ -21,6 +21,28 @@ public:
             expr->accept(*this);
             std::cout << "\n";
         }
+    }
+
+    void print(std::vector<std::unique_ptr<Stmt>> &statements)
+    {
+        for (const auto &stmt : statements)
+        {
+            stmt->accept(*this);
+            std::cout << "\n";
+        }
+    }
+
+    std::any visit(const Stmt::Expression &expr) override
+    {
+        expr.get_expression()->accept(*this);
+        return std::any(); // Return an empty std::any as the return type is std::any
+    }
+    
+    std::any visit(const Stmt::Print &expr) override
+    {
+        std::cout << "print ";
+        expr.get_expression()->accept(*this);
+        return std::any(); // Return an empty std::any as the return type is std::any
     }
 
     std::any visit(const Expr::Binary &expr) override

@@ -40,7 +40,7 @@ void Lox::parse(const std::string &source)
     }
 
     Parser parser(tokens);
-    std::vector<std::unique_ptr<Expr>> expressions = parser.parse();
+    std::vector<std::unique_ptr<Expr>> expressions = parser.parse_expr();
     if (had_error)
     {
         // std::cerr << "Parsing failed with errors." << std::endl;
@@ -67,8 +67,8 @@ void Lox::evaluate(const std::string &source)
     }
 
     Parser parser(tokens);
-    std::vector<std::unique_ptr<Expr>> expressions = parser.parse();
-    
+    std::vector<std::unique_ptr<Expr>> expressions = parser.parse_expr();
+
     // AstPrinter printer;
     // for (const auto &expr : expressions)
     // {
@@ -98,13 +98,22 @@ void Lox::run(const std::string &source)
     // Implementation of the run method
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scan_tokens();
-    for (const Token &token : tokens)
-    {
-        std::cout << token << std::endl;
-    }
     if (had_error)
     {
         exit(65); // Exit with an error code if there was an error
+    }
+    Parser parser(tokens);
+    std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+        return;
+    }
+    Interpreter interpreter;
+    interpreter.interpret(statements);
+    if (had_runtime_error)
+    {
+        exit(70); // Exit with a runtime error code if there was a runtime error
     }
     return;
 }

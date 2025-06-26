@@ -3,7 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <memory>
-#include "expr.h"
+#include "stmt.h"
 
 // Define a custom exception class for parser errors
 class ParserError : public std::runtime_error
@@ -41,6 +41,13 @@ private:
     std::unique_ptr<Expr> unary();
     // true | false | nuil | number | string | identifier | "(" expr ")""
     std::unique_ptr<Expr> primary();
+    /* parse stmt */
+    // exprStmt | printStmt
+    std::unique_ptr<Stmt> statement();
+    // printStmt
+    std::unique_ptr<Stmt> print_stmt();
+    // exprStmt
+    std::unique_ptr<Stmt> expression_stmt();
 
     /* helper functions */
     bool is_at_end();
@@ -57,5 +64,6 @@ private:
 public:
     Parser(const std::vector<Token> &tokens);
     ~Parser();
-    std::vector<std::unique_ptr<Expr>> parse();
+    std::vector<std::unique_ptr<Expr>> parse_expr();
+    std::vector<std::unique_ptr<Stmt>> parse();
 };

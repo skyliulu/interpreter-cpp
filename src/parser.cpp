@@ -6,7 +6,7 @@ Parser::Parser(const std::vector<Token> &token) : tokens(token), current(0) {}
 
 Parser::~Parser() {}
 
-std::vector<std::unique_ptr<Expr>> Parser::parse()
+std::vector<std::unique_ptr<Expr>> Parser::parse_expr()
 {
     try
     {
@@ -20,8 +20,49 @@ std::vector<std::unique_ptr<Expr>> Parser::parse()
     catch (const ParserError &e)
     {
         synchronize(); // Attempt to recover from the error
-        return {}; // Return an empty vector if parsing fails
+        return {};     // Return an empty vector if parsing fails
     }
+}
+
+std::vector<std::unique_ptr<Stmt>> Parser::parse()
+{
+    try
+    {
+        std::vector<std::unique_ptr<Stmt>> stmts;
+        while (!is_at_end())
+        {
+            stmts.push_back(statement());
+        }
+        return stmts;
+    }
+    catch (const ParserError &e)
+    {
+        synchronize(); // Attempt to recover from the error
+        return {};     // Return an empty vector if parsing fails
+    }
+}
+
+std::unique_ptr<Stmt> Parser::statement()
+{
+    if (match({TokenType::PRINT}))
+    {
+        return print_stmt();
+    }
+    return expression_stmt();
+}
+
+std::unique_ptr<Stmt> Parser::print_stmt()
+{
+    std::unique_ptr<Expr> expr = expresstion();
+    consume(TokenType::SEMICOLON, "Expect ';' after value.");
+    return std::make_unique<Stmt::Print>(std::move(expr));
+}
+
+std::unique_ptr<Stmt> Parser::expression_stmt()
+{
+    std::unique_ptr<Expr> expr = expresstion();
+    consume(TokenType::SEMICOLON, "Expect ';' after expression.");
+    return std::make_unique<Stmt::Expression>(std::move(expr));
 }
 
 std::unique_ptr<Expr> Parser::expresstion()

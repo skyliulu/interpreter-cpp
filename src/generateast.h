@@ -18,12 +18,8 @@ void define_visitor(std::ofstream &out, const std::string &className, const std:
 void generate_ast()
 {
     std::string outputDir = "src";
-    define_ast(outputDir, "Expr", {
-        "Binary : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right", 
-        "Unary : Token operator_, std::unique_ptr<Expr> right", 
-        "Literal : Token keyword, LiteralToken value", 
-        "Grouping : std::unique_ptr<Expr> expression"
-    });
+    define_ast(outputDir, "Expr", {"Binary : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right", "Unary : Token operator_, std::unique_ptr<Expr> right", "Literal : Token keyword, LiteralToken value", "Grouping : std::unique_ptr<Expr> expression"});
+    define_ast(outputDir, "Stmt", {"Expression : std::unique_ptr<Expr> expression", "Print : std::unique_ptr<Expr> expression"});
 }
 
 void define_ast(const std::string &outputDir, const std::string &className, const std::vector<std::string> &fields)
@@ -36,7 +32,14 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
     }
 
     out << "#pragma once\n";
-    out << "#include \"token.h\"\n";
+    if (className == "Stmt")
+    {
+        out << "#include \"expr.h\"\n"; // Include expr.h for Stmt
+    }
+    else
+    {
+        out << "#include \"token.h\"\n";
+    }
     out << "#include <memory>\n";
     out << "#include <any>\n";
     out << "class " << className << "\n{\npublic:\n";
@@ -60,7 +63,7 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
     out << "\tvirtual std::any accept(Visitor &visitor) const = 0;\n";
     out << "};\n";
     out << "\n";
-    
+
     define_visitor(out, className, nestedClasses);
     out << "\n";
 

@@ -19,9 +19,42 @@ void Interpreter::interpret(const Expr &expr)
     }
 }
 
+void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts)
+{
+    try
+    {
+        for (const auto &stmt : stmts)
+        {
+            execute(*stmt);
+        }
+    }
+    catch (const RuntimeError &e)
+    {
+        Lox::runtime_error(e);
+    }
+}
+
+void Interpreter::execute(const Stmt &stmt)
+{
+    stmt.accept(*this);
+}
+
 std::any Interpreter::evaluate(const Expr &expr)
 {
     return expr.accept(*this);
+}
+
+
+std::any Interpreter::visit(const Stmt::Expression &expr)
+{
+    return evaluate(*(expr.get_expression()));
+}
+
+std::any Interpreter::visit(const Stmt::Print &expr)
+{
+    std::any value = evaluate(*(expr.get_expression()));
+    std::cout << stringify(value) << std::endl;
+    return value; // Return the value for potential further use
 }
 
 std::any Interpreter::visit(const Expr::Binary &expr)
@@ -33,7 +66,7 @@ std::any Interpreter::visit(const Expr::Binary &expr)
     case PLUS:
         if (left.type() == typeid(std::string) && right.type() == typeid(std::string))
         {
-            return  std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
+            return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
         }
         if (left.type() == typeid(double) && right.type() == typeid(double))
         {
