@@ -110,8 +110,8 @@ void Lox::run(const std::string &source)
         return;
     }
     AstPrinter printer;
-    printer.print(statements);
-    
+    // printer.print(statements);
+
     Interpreter interpreter;
     interpreter.interpret(statements);
     if (had_runtime_error)
