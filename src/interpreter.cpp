@@ -14,6 +14,17 @@ Interpreter::~Interpreter()
 {
 }
 
+Interpreter::EnvironmentGuard::EnvironmentGuard(Interpreter &interp, std::shared_ptr<Environment> new_env)
+    : interpreter(interp), previous(interp.environment)
+{
+    interpreter.environment = new_env;
+}
+
+Interpreter::EnvironmentGuard::~EnvironmentGuard()
+{
+    interpreter.environment = previous;
+}
+
 void Interpreter::interpret(const Expr &expr)
 {
     try
@@ -53,10 +64,9 @@ std::any Interpreter::evaluate(const Expr &expr)
     return expr.accept(*this);
 }
 
-void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, std::shared_ptr<Environment> env)
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, const std::shared_ptr<Environment> &env)
 {
-    std::shared_ptr<Environment> previous = environment; // Save the current environment
-    environment = env;                  // Create a new environment for the block
+    EnvironmentGuard guard(*this, env); // Create a new environment for the block
     try
     {
         for (const auto &statement : stmts)
@@ -66,10 +76,8 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     }
     catch (const RuntimeError &e)
     {
-        environment = previous; // Restore the previous environment on error
-        throw e;                // Re-throw the error
+        throw; // Re-throw the error
     }
-    environment = previous; // Restore the previous environment after execution
 }
 
 std::any Interpreter::visit(const Stmt::Return &expr)
@@ -77,6 +85,7 @@ std::any Interpreter::visit(const Stmt::Return &expr)
     if (expr.get_value())
     {
         std::any val = evaluate(*(expr.get_value()));
+        // std::cout << stringify(val) << std::endl;
         throw Return(val);
     }
     else
@@ -122,7 +131,7 @@ std::any Interpreter::visit(const Stmt::Var &expr)
         value = nullptr; // If no initializer, set to nil
     }
     environment->define(expr.get_name().get_lexeme(), value); // Define the variable in the environment
-    return value;                                            // Return the initialized value
+    return value;                                             // Return the initialized value
 }
 
 std::any Interpreter::visit(const Stmt::While &expr)
@@ -184,6 +193,7 @@ std::any Interpreter::visit(const Expr::Binary &expr)
 {
     std::any left = evaluate(*(expr.get_left()));
     std::any right = evaluate(*(expr.get_right()));
+    // std::cout << stringify(left) << " " << tokentype_to_string(expr.get_operator_().get_type()) << " " << stringify(right) << std::endl;
     switch (expr.get_operator_().get_type())
     {
     case PLUS:

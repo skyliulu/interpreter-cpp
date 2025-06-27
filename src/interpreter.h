@@ -21,12 +21,25 @@ private:
     void check_number_operands(const Token &operator_, const std::any &left, const std::any &right);
     bool equality(const std::any &left, const std::any &right);
 
+    class EnvironmentGuard
+    {
+    private:
+        Interpreter &interpreter;
+        std::shared_ptr<Environment> previous;
+
+    public:
+        EnvironmentGuard(Interpreter &interp, std::shared_ptr<Environment> new_env);
+        ~EnvironmentGuard();
+        EnvironmentGuard(const EnvironmentGuard &) = delete;
+        EnvironmentGuard &operator=(const EnvironmentGuard &) = delete;
+    };
+
 public:
     Interpreter(/* args */);
     ~Interpreter();
     void interpret(const Expr &expr);
     void interpret(const std::vector<std::unique_ptr<Stmt>> &stmts);
-    void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, std::shared_ptr<Environment> env);
+    void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, const std::shared_ptr<Environment> &env);
     // stmt visitor methods
     std::any visit(const Stmt::Expression &expr) override;
     std::any visit(const Stmt::Print &expr) override;

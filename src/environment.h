@@ -16,6 +16,12 @@ public:
     ~Environment() {}
     void define(const std::string &name, const std::any &value)
     {
+        // std::cout << "define " << name;
+        // if (value.type() == typeid(double))
+        // {
+        //     std::cout << " " << std::any_cast<double>(value);
+        // }
+        // std::cout << std::endl;
         values[name] = value; // Define a variable with its value
     }
     void assign(const Token &token, const std::any &value)
@@ -38,6 +44,12 @@ public:
         auto it = values.find(token.get_lexeme()); // Find the variable by its name
         if (it != values.end())
         {
+            // std::cout << "get " << token.get_lexeme();
+            // if (it->second.type() == typeid(double))
+            // {
+            //     std::cout << " " << std::any_cast<double>(it->second) ;
+            // }
+            // std::cout << std::endl;
             return it->second; // Return the value of the variable
         }
         if (enclosing)
@@ -45,5 +57,17 @@ public:
             return enclosing->get(token); // Try to get the variable from the enclosing environment
         }
         throw RuntimeError(token, "Undefined variable '" + token.get_lexeme() + "'."); // Throw an error if the variable is not defined
+    }
+
+    int deepth()
+    {
+        int deep = 0;
+        std::shared_ptr<Environment> ptr = enclosing;
+        while (ptr.get())
+        {
+            deep++;
+            ptr = ptr->enclosing;
+        }
+        return deep;
     }
 };
