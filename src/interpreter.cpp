@@ -312,7 +312,7 @@ std::any Interpreter::visit(const Expr::Grouping &expr)
 
 std::string Interpreter::stringify(const std::any &value)
 {
-    if (value.type() == typeid(std::nullptr_t))
+    if (value.type() == typeid(std::nullptr_t) || !value.has_value())
     {
         return "nil";
     }
