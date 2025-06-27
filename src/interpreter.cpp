@@ -262,9 +262,9 @@ std::any Interpreter::visit(const Expr::Call &expr)
         parmas.push_back(evaluate(*arg));
     }
     // std::cout << callee.type().name() << std::endl;
-    if (std::shared_ptr<Callable> callable = std::any_cast<std::shared_ptr<Callable>>(callee))
+    if (callee.type() == typeid(std::shared_ptr<Callable>))
     {
-        // Callable *callable = callable_ptr_func();
+        std::shared_ptr<Callable> callable = std::any_cast<std::shared_ptr<Callable>>(callee);
         if (parmas.size() != callable->arity())
         {
             throw RuntimeError(expr.get_paren(), "Expect " + std::to_string(callable->arity()) + " arguments but got " + std::to_string(parmas.size()) + ".");
