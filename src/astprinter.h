@@ -34,6 +34,7 @@ public:
 
     std::any visit(const Stmt::Return &expr) override
     {
+        std::cout << "return" << std::endl;
         return std::any();
     }
 

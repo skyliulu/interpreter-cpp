@@ -7,7 +7,7 @@
 Interpreter::Interpreter(/* args */)
 {
     std::shared_ptr<Callable> clock = std::make_shared<Clock>();
-    global.define("clock", clock);
+    global->define("clock", clock);
 }
 
 Interpreter::~Interpreter()
@@ -53,9 +53,9 @@ std::any Interpreter::evaluate(const Expr &expr)
     return expr.accept(*this);
 }
 
-void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, Environment env)
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, std::shared_ptr<Environment> env)
 {
-    Environment previous = environment; // Save the current environment
+    std::shared_ptr<Environment> previous = environment; // Save the current environment
     environment = env;                  // Create a new environment for the block
     try
     {
@@ -88,13 +88,13 @@ std::any Interpreter::visit(const Stmt::Return &expr)
 std::any Interpreter::visit(const Stmt::Func &expr)
 {
     std::shared_ptr<Callable> function_ptr = std::make_shared<Function>(expr, environment);
-    environment.define(expr.get_name().get_lexeme(), function_ptr);
+    environment->define(expr.get_name().get_lexeme(), function_ptr);
     return function_ptr;
 }
 
 std::any Interpreter::visit(const Stmt::Block &expr)
 {
-    execute_block(expr.get_statements(), Environment(&environment));
+    execute_block(expr.get_statements(), environment);
     return std::any(); // Return an empty std::any as the return type is std::any
 }
 
@@ -121,7 +121,7 @@ std::any Interpreter::visit(const Stmt::Var &expr)
     {
         value = nullptr; // If no initializer, set to nil
     }
-    environment.define(expr.get_name().get_lexeme(), value); // Define the variable in the environment
+    environment->define(expr.get_name().get_lexeme(), value); // Define the variable in the environment
     return value;                                            // Return the initialized value
 }
 
@@ -170,13 +170,13 @@ std::any Interpreter::visit(const Expr::Logical &expr)
 
 std::any Interpreter::visit(const Expr::Variable &expr)
 {
-    return environment.get(expr.get_name());
+    return environment->get(expr.get_name());
 }
 
 std::any Interpreter::visit(const Expr::Assign &expr)
 {
     std::any value = evaluate(*(expr.get_value()));
-    environment.assign(expr.get_name(), value);
+    environment->assign(expr.get_name(), value);
     return value;
 }
 
@@ -318,7 +318,7 @@ std::string Interpreter::stringify(const std::any &value)
     {
         return std::any_cast<bool>(value) ? "true" : "false";
     }
-    else if(value.type() == typeid(std::shared_ptr<Callable>))
+    else if (value.type() == typeid(std::shared_ptr<Callable>))
     {
         return std::any_cast<std::shared_ptr<Callable>>(value)->to_string();
     }

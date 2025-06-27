@@ -10,9 +10,9 @@ class Environment
 private:
     /* data */
     std::unordered_map<std::string, std::any> values; // Store variable names and their values
-    Environment *enclosing = nullptr;                 // Pointer to the enclosing environment for nested scopes
+    std::shared_ptr<Environment> enclosing;           // Pointer to the enclosing environment for nested scopes
 public:
-    Environment(Environment *enclosing = nullptr) : enclosing(enclosing) {}
+    Environment(std::shared_ptr<Environment> enclosing = nullptr) : enclosing(std::move(enclosing)) {}
     ~Environment() {}
     void define(const std::string &name, const std::any &value)
     {

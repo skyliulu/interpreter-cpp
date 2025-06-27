@@ -10,8 +10,8 @@ class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
 private:
     /* data */
-    Environment global;
-    Environment &environment = global; // The environment to store variable values
+    std::shared_ptr<Environment> global = std::make_shared<Environment>();
+    std::shared_ptr<Environment> environment = global; // The environment to store variable values
     /* helper functions */
     void execute(const Stmt &stmt);
     std::any evaluate(const Expr &expr);
@@ -26,7 +26,7 @@ public:
     ~Interpreter();
     void interpret(const Expr &expr);
     void interpret(const std::vector<std::unique_ptr<Stmt>> &stmts);
-    void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, Environment env);
+    void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, std::shared_ptr<Environment> env);
     // stmt visitor methods
     std::any visit(const Stmt::Expression &expr) override;
     std::any visit(const Stmt::Print &expr) override;

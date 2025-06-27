@@ -7,10 +7,10 @@ class Function : public Callable
 private:
     /* data */
     const Stmt::Func &declaration;
-    Environment enclosing;
+    std::shared_ptr<Environment> enclosing;
 
 public:
-    Function(const Stmt::Func &declaration, Environment enclosing) : declaration(declaration), enclosing(enclosing) {}
+    Function(const Stmt::Func &declaration, std::shared_ptr<Environment> enclosing) : declaration(declaration), enclosing(enclosing) {}
     ~Function() {}
     int arity() override
     {
@@ -19,11 +19,11 @@ public:
 
     std::any call(Interpreter &interpreter, std::vector<std::any> arguments) override
     {
-        Environment env(&enclosing);
+        std::shared_ptr<Environment> env = std::make_shared<Environment>(enclosing);
         std::vector<Token> params = declaration.get_params();
         for (int i = 0; i < arguments.size(); i++)
         {
-            env.define(params.at(i).get_lexeme(), arguments.at(i));
+            env->define(params.at(i).get_lexeme(), arguments.at(i));
         }
 
         try
