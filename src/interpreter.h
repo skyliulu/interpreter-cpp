@@ -10,7 +10,8 @@ class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
 private:
     /* data */
-    Environment environment; // The environment to store variable values
+    Environment global;
+    Environment &environment = global; // The environment to store variable values
     /* helper functions */
     void execute(const Stmt &stmt);
     std::any evaluate(const Expr &expr);
@@ -40,4 +41,5 @@ public:
     std::any visit(const Expr::Variable &expr) override;
     std::any visit(const Expr::Assign &expr) override;
     std::any visit(const Expr::Logical &expr) override;
+    std::any visit(const Expr::Call &expr) override;
 };

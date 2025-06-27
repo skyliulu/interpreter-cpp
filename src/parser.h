@@ -43,8 +43,10 @@ private:
     std::unique_ptr<Expr> term();
     // unary (("*" | "/") unary ）*
     std::unique_ptr<Expr> factor();
-    // ("-" | "!") expr
+    // ("-" | "!") expr | call
     std::unique_ptr<Expr> unary();
+    // primary ("(" arguments? ")")*
+    std::unique_ptr<Expr> call();
     // true | false | nuil | number | string | identifier | "(" expr ")""
     std::unique_ptr<Expr> primary();
     /* parse stmt */

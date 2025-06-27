@@ -132,6 +132,11 @@ public:
         return std::any(); 
     }
 
+    std::any visit(const Expr::Call& expr) override
+    {
+        return std::any();
+    }
+
     std::any visit(const Expr::Literal &expr) override
     {
         if (std::holds_alternative<std::string>(expr.get_value()))

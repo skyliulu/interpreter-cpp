@@ -1,9 +1,15 @@
 #include "interpreter.h"
 #include "lox.h"
+#include "nativefunc.h"
 
-Interpreter::Interpreter(/* args */) {}
+Interpreter::Interpreter(/* args */)
+{
+    global.define("clock", new Clock());
+}
 
-Interpreter::~Interpreter() {}
+Interpreter::~Interpreter() {
+    
+}
 
 void Interpreter::interpret(const Expr &expr)
 {
@@ -206,6 +212,29 @@ std::any Interpreter::visit(const Expr::Unary &expr)
         return !is_truthy(right);
     default:
         return std::any(); // Should never reach here, but return an empty std::any for safety
+    }
+}
+
+std::any Interpreter::visit(const Expr::Call &expr)
+{
+    std::any callee = evaluate(*expr.get_callee());
+    std::vector<std::any> parmas;
+    for (const auto &arg : expr.get_arguments())
+    {
+        parmas.push_back(evaluate(*arg));
+    }
+    if (callee.type() == typeid(Callable *))
+    {
+        Callable *callable = std::any_cast<Callable *>(callee);
+        if (parmas.size() != callable->arity())
+        {
+            throw RuntimeError(expr.get_paren(), "Expect " + std::to_string(callable->arity()) + " arguments but got " + std::to_string(parmas.size()) + ".");
+        }
+        return callable->call(*this, std::move(parmas));
+    }
+    else
+    {
+        throw RuntimeError(expr.get_paren(), "Can only call functions and classes.");
     }
 }
 

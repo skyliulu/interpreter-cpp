@@ -14,6 +14,7 @@ public:
 	class Variable ;
 	class Assign ;
 	class Logical ;
+	class Call ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -29,6 +30,7 @@ public:
 	virtual std::any visit(const Variable  &expr) = 0;
 	virtual std::any visit(const Assign  &expr) = 0;
 	virtual std::any visit(const Logical  &expr) = 0;
+	virtual std::any visit(const Call  &expr) = 0;
 };
 
 class Expr::Binary  : public Expr
@@ -149,6 +151,26 @@ public:
 	Expr* get_left() const { return left.get(); }
 	Token get_operator_() const { return operator_; }
 	Expr* get_right() const { return right.get(); }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Expr::Call  : public Expr
+{
+private:
+	std::unique_ptr<Expr> callee;
+	Token paren;
+	std::vector<std::unique_ptr<Expr>> arguments;
+public:
+	Call (std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments) : callee(std::move(callee)), paren(paren), arguments(std::move(arguments))
+	{
+	}
+	~Call () {}
+	Expr* get_callee() const { return callee.get(); }
+	Token get_paren() const { return paren; }
+	const std::vector<std::unique_ptr<Expr>>& get_arguments() const { return arguments; }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);

@@ -319,7 +319,30 @@ std::unique_ptr<Expr> Parser::unary()
         std::unique_ptr<Expr> right = unary();
         return std::make_unique<Expr::Unary>(operator_, std::move(right));
     }
-    return primary();
+    return call();
+}
+
+std::unique_ptr<Expr> Parser::call()
+{
+    std::unique_ptr<Expr> expr = primary();
+    while (match({TokenType::LEFT_PAREN}))
+    {
+        std::vector<std::unique_ptr<Expr>> args;
+        if (!check(TokenType::RIGHT_PAREN))
+        {
+            do
+            {
+                if (args.size() >= 255)
+                {
+                    error(peek(), "Can't have more than 255 augments.");
+                }
+                args.emplace_back(expresstion());
+            } while (match({TokenType::COMMA}));
+        }
+        consume(TokenType::RIGHT_PAREN, "Expect ')' after augments.");
+        expr = std::make_unique<Expr::Call>(std::move(expr), previous(), std::move(args));
+    }
+    return expr;
 }
 
 std::unique_ptr<Expr> Parser::primary()
