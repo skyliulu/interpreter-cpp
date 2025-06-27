@@ -318,6 +318,10 @@ std::string Interpreter::stringify(const std::any &value)
     {
         return std::any_cast<bool>(value) ? "true" : "false";
     }
+    else if(value.type() == typeid(std::shared_ptr<Callable>))
+    {
+        return std::any_cast<std::shared_ptr<Callable>>(value)->to_string();
+    }
     return "unknown";
 }
 

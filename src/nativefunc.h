@@ -24,4 +24,9 @@ public:
         // 将毫秒数转换为以秒为单位的 double
         return static_cast<double>(millis) / 1000.0;
     }
+
+    std::string to_string() const override
+    {
+        return "clock";
+    }
 };

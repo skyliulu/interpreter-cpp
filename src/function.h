@@ -36,4 +36,9 @@ public:
             return return_stmt.get_value();
         }
     }
+
+    std::string to_string() const override
+    {
+        return declaration.get_name().get_lexeme();
+    }
 };
