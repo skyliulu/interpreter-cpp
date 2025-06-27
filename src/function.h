@@ -39,6 +39,6 @@ public:
 
     std::string to_string() const override
     {
-        return declaration.get_name().get_lexeme();
+        return "<fn " + declaration.get_name().get_lexeme() + ">";
     }
 };

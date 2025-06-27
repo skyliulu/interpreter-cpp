@@ -27,6 +27,6 @@ public:
 
     std::string to_string() const override
     {
-        return "clock";
+        return "<fn clock>";
     }
 };
