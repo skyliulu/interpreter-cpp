@@ -32,6 +32,16 @@ public:
         }
     }
 
+    std::any visit(const Stmt::Return &expr) override
+    {
+        return std::any();
+    }
+
+    std::any visit(const Stmt::Func &expr) override
+    {
+        return std::any();
+    }
+
     std::any visit(const Stmt::Block &expr) override
     {
         std::cout << "{\n";

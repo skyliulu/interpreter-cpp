@@ -43,6 +43,10 @@ std::unique_ptr<Stmt> Parser::declaration()
         {
             return var_decl();
         }
+        if (match({TokenType::FUN}))
+        {
+            return func_decl();
+        }
         return statement();
     }
     catch (const ParserError &e)
@@ -50,6 +54,28 @@ std::unique_ptr<Stmt> Parser::declaration()
         synchronize();
         return {};
     }
+}
+
+std::unique_ptr<Stmt> Parser::func_decl()
+{
+    Token name = consume(TokenType::IDENTIFIER, "Expect name after fun.");
+    consume(TokenType::LEFT_PAREN, "Expect '(' after func name.");
+    std::vector<Token> param;
+    if (!check(TokenType::RIGHT_PAREN))
+    {
+        do
+        {
+            if (param.size() >= 255)
+            {
+                error(previous(), "params count should less than 255.");
+            }
+            param.push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
+        } while (match({TokenType::COMMA}));
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after params.");
+    consume(TokenType::LEFT_BRACE, "Expect '{' in func body");
+    std::vector<std::unique_ptr<Stmt>> stmts = parse_block();
+    return std::make_unique<Stmt::Func>(name, param, std::move(stmts));
 }
 
 std::unique_ptr<Stmt> Parser::var_decl()
@@ -90,7 +116,23 @@ std::unique_ptr<Stmt> Parser::statement()
     {
         return for_stmt();
     }
+    else if (match({TokenType::RETURN}))
+    {
+        return return_stmt();
+    }
     return expression_stmt();
+}
+
+std::unique_ptr<Stmt> Parser::return_stmt()
+{
+    Token keyword = previous();
+    std::unique_ptr<Expr> value = nullptr;
+    if (!check(TokenType::SEMICOLON))
+    {
+        value = expresstion();
+    }
+    consume(TokenType::SEMICOLON, "Expect ';' after return value.");
+    return std::make_unique<Stmt::Return>(keyword, std::move(value));
 }
 
 std::unique_ptr<Stmt> Parser::for_stmt()
@@ -179,7 +221,13 @@ std::unique_ptr<Stmt> Parser::if_stmt()
     return std::make_unique<Stmt::If>(std::move(condition), std::move(thenBranch), std::move(elseBranch));
 }
 
-std::unique_ptr<Stmt> Parser::block_stmt()
+std::unique_ptr<Stmt::Block> Parser::block_stmt()
+{
+    std::vector<std::unique_ptr<Stmt>> stmts = parse_block();
+    return std::make_unique<Stmt::Block>(std::move(stmts));
+}
+
+std::vector<std::unique_ptr<Stmt>> Parser::parse_block()
 {
     std::vector<std::unique_ptr<Stmt>> statements;
     while (!is_at_end() && !check(TokenType::RIGHT_BRACE))
@@ -187,7 +235,7 @@ std::unique_ptr<Stmt> Parser::block_stmt()
         statements.push_back(declaration());
     }
     consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
-    return std::make_unique<Stmt::Block>(std::move(statements));
+    return std::move(statements);
 }
 
 std::unique_ptr<Stmt> Parser::print_stmt()

@@ -2,13 +2,12 @@
 #include "lox.h"
 #include "nativefunc.h"
 #include <functional>
+#include "function.h"
 
 Interpreter::Interpreter(/* args */)
 {
-    global.define("clock", std::function<Callable*()>([]() {
-        static auto smart_ptr = std::make_shared<Clock>();
-        return smart_ptr.get();
-    }));
+    std::shared_ptr<Callable> clock = std::make_shared<Clock>();
+    global.define("clock", clock);
 }
 
 Interpreter::~Interpreter()
@@ -54,13 +53,13 @@ std::any Interpreter::evaluate(const Expr &expr)
     return expr.accept(*this);
 }
 
-std::any Interpreter::visit(const Stmt::Block &expr)
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, Environment env)
 {
-    Environment previous = environment;   // Save the current environment
-    environment = Environment(&previous); // Create a new environment for the block
+    Environment previous = environment; // Save the current environment
+    environment = env;                  // Create a new environment for the block
     try
     {
-        for (const auto &statement : expr.get_statements())
+        for (const auto &statement : stmts)
         {
             execute(*statement);
         }
@@ -71,7 +70,32 @@ std::any Interpreter::visit(const Stmt::Block &expr)
         throw e;                // Re-throw the error
     }
     environment = previous; // Restore the previous environment after execution
-    return std::any();      // Return an empty std::any as the return type is std::any
+}
+
+std::any Interpreter::visit(const Stmt::Return &expr)
+{
+    if (expr.get_value())
+    {
+        std::any val = evaluate(*(expr.get_value()));
+        throw Return(val);
+    }
+    else
+    {
+        throw Return(std::any());
+    }
+}
+
+std::any Interpreter::visit(const Stmt::Func &expr)
+{
+    std::shared_ptr<Callable> function_ptr = std::make_shared<Function>(expr, environment);
+    environment.define(expr.get_name().get_lexeme(), function_ptr);
+    return function_ptr;
+}
+
+std::any Interpreter::visit(const Stmt::Block &expr)
+{
+    execute_block(expr.get_statements(), Environment(&environment));
+    return std::any(); // Return an empty std::any as the return type is std::any
 }
 
 std::any Interpreter::visit(const Stmt::Expression &expr)
@@ -227,9 +251,10 @@ std::any Interpreter::visit(const Expr::Call &expr)
     {
         parmas.push_back(evaluate(*arg));
     }
-    if (std::function<Callable*()> callable_ptr_func = std::any_cast<std::function<Callable*()>>(callee))
+    // std::cout << callee.type().name() << std::endl;
+    if (std::shared_ptr<Callable> callable = std::any_cast<std::shared_ptr<Callable>>(callee))
     {
-        Callable* callable = callable_ptr_func();
+        // Callable *callable = callable_ptr_func();
         if (parmas.size() != callable->arity())
         {
             throw RuntimeError(expr.get_paren(), "Expect " + std::to_string(callable->arity()) + " arguments but got " + std::to_string(parmas.size()) + ".");

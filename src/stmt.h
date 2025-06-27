@@ -13,6 +13,8 @@ public:
 	class Block ;
 	class If ;
 	class While ;
+	class Func ;
+	class Return ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -27,6 +29,8 @@ public:
 	virtual std::any visit(const Block  &expr) = 0;
 	virtual std::any visit(const If  &expr) = 0;
 	virtual std::any visit(const While  &expr) = 0;
+	virtual std::any visit(const Func  &expr) = 0;
+	virtual std::any visit(const Return  &expr) = 0;
 };
 
 class Stmt::Expression  : public Stmt
@@ -127,6 +131,44 @@ public:
 	~While () {}
 	Expr* get_condition() const { return condition.get(); }
 	Stmt* get_body() const { return body.get(); }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Stmt::Func  : public Stmt
+{
+private:
+	Token name;
+	std::vector<Token> params;
+	std::vector<std::unique_ptr<Stmt>> body;
+public:
+	Func (Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body) : name(name), params(params), body(std::move(body))
+	{
+	}
+	~Func () {}
+	Token get_name() const { return name; }
+	const std::vector<Token>& get_params() const { return params; }
+	const std::vector<std::unique_ptr<Stmt>>& get_body() const { return body; }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Stmt::Return  : public Stmt
+{
+private:
+	Token keyword;
+	std::unique_ptr<Expr> value;
+public:
+	Return (Token keyword, std::unique_ptr<Expr> value) : keyword(keyword), value(std::move(value))
+	{
+	}
+	~Return () {}
+	Token get_keyword() const { return keyword; }
+	Expr* get_value() const { return value.get(); }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);

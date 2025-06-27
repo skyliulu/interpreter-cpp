@@ -1,1 +1,2 @@
-print clock() + 34;
+fun bar() { print 10; }
+bar();

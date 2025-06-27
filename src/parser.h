@@ -50,25 +50,28 @@ private:
     // true | false | nuil | number | string | identifier | "(" expr ")""
     std::unique_ptr<Expr> primary();
     /* parse stmt */
-    // exprStmt | printStmt | block | ifStmt | whileStmt | forStmt
+    // exprStmt | printStmt | block | ifStmt | whileStmt | forStmt | returnStmt
     std::unique_ptr<Stmt> statement();
     // "print" expr ";"
     std::unique_ptr<Stmt> print_stmt();
     // expr ";"
     std::unique_ptr<Stmt> expression_stmt();
     // "{" stmt* "}"
-    std::unique_ptr<Stmt> block_stmt();
+    std::unique_ptr<Stmt::Block> block_stmt();
     // "if" "(" expr ")" stmt ("else" stmt)?
     std::unique_ptr<Stmt> if_stmt();
     // "while" "(" expr ")" stmt
     std::unique_ptr<Stmt> while_stmt();
     // "for" "(" (varStmt | exprStmt)? ";" expr? ";" expr? ")" stmt
     std::unique_ptr<Stmt> for_stmt();
+    std::unique_ptr<Stmt> return_stmt();
     /* parse decl */
-    // var_decl | statement
+    // func_decl | var_decl | statement
     std::unique_ptr<Stmt> declaration();
     // "var" IDENTIFIER ("=" expr)? ";"
     std::unique_ptr<Stmt> var_decl();
+    // "func" IDENTIFIER "(" params? ")" block_stmt
+    std::unique_ptr<Stmt> func_decl();
 
     /* helper functions */
     bool is_at_end();
@@ -81,6 +84,7 @@ private:
     bool match(const std::vector<TokenType> &types);
     ParserError error(Token token, const std::string &message);
     void synchronize();
+    std::vector<std::unique_ptr<Stmt>> parse_block();
 
 public:
     Parser(const std::vector<Token> &tokens);

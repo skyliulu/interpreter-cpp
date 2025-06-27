@@ -9,11 +9,11 @@ private:
 public:
     Clock(/* args */) {}
     ~Clock() {}
-    int arity()
+    int arity() override
     {
         return 0;
     }
-    std::any call(const Interpreter &interpreter, std::vector<std::any> arguments)
+    std::any call(Interpreter &interpreter, std::vector<std::any> arguments) override
     {
         // 获取当前时间点
         auto now = std::chrono::system_clock::now();
