@@ -1,14 +1,18 @@
 #include "interpreter.h"
 #include "lox.h"
 #include "nativefunc.h"
+#include <functional>
 
 Interpreter::Interpreter(/* args */)
 {
-    global.define("clock", new Clock());
+    global.define("clock", std::function<Callable*()>([]() {
+        static auto smart_ptr = std::make_shared<Clock>();
+        return smart_ptr.get();
+    }));
 }
 
-Interpreter::~Interpreter() {
-    
+Interpreter::~Interpreter()
+{
 }
 
 void Interpreter::interpret(const Expr &expr)
@@ -223,9 +227,9 @@ std::any Interpreter::visit(const Expr::Call &expr)
     {
         parmas.push_back(evaluate(*arg));
     }
-    if (callee.type() == typeid(Callable *))
+    if (std::function<Callable*()> callable_ptr_func = std::any_cast<std::function<Callable*()>>(callee))
     {
-        Callable *callable = std::any_cast<Callable *>(callee);
+        Callable* callable = callable_ptr_func();
         if (parmas.size() != callable->arity())
         {
             throw RuntimeError(expr.get_paren(), "Expect " + std::to_string(callable->arity()) + " arguments but got " + std::to_string(parmas.size()) + ".");
