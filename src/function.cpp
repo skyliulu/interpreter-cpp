@@ -1,7 +1,6 @@
 //
 // Created by 29043 on 25-6-28.
 //
-#pragma once
 #include "function.h"
 
 Function::Function(const Stmt::Func &declaration, std::shared_ptr<Environment> enclosing) : declaration(declaration),
@@ -47,7 +46,6 @@ std::string Function::to_string() const {
 }
 
 ::Class::~Class() {
-
 }
 
 std::string Class::to_string() const {
@@ -62,13 +60,20 @@ std::shared_ptr<Function> Class::get_method(const std::string &name) const {
     return nullptr;
 }
 
+int Class::arity() {
+    return 0;
+}
 
-::Instance::Instance(const Class &clazz) : clazz(clazz){
+std::any Class::call(Interpreter &interpreter, std::vector<std::any> arguments) {
 
+    std::shared_ptr<Instance> instance = std::make_shared<Instance>(*this);
+    return instance;
+}
+
+::Instance::Instance(const Class &clazz) : clazz(clazz) {
 }
 
 ::Instance::~Instance() {
-
 }
 
 void ::Instance::set(const Token &token, const std::any &value) {
@@ -84,4 +89,8 @@ std::any Instance::get(const Token &token) {
         return function->bind(*this);
     }
     throw RuntimeError(token, "Undefined property '" + token.get_lexeme() + "'.");
+}
+
+std::string Instance::to_string() const {
+    return clazz.to_string() + " instance";
 }
