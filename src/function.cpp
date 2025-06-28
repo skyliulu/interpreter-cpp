@@ -21,7 +21,8 @@ std::shared_ptr<Function> Function::bind(std::shared_ptr<Instance> instance) {
     return std::make_shared<Function>(declaration, env, is_init);
 }
 
-std::any Function::call(Interpreter &interpreter, std::vector<std::any> arguments) {
+std::any Function::call(const std::shared_ptr<Callable> &callable, Interpreter &interpreter,
+                        std::vector<std::any> arguments) {
     std::shared_ptr<Environment> env = std::make_shared<Environment>(enclosing);
     const std::vector<Token> params = declaration.get_params();
     for (int i = 0; i < arguments.size(); i++) {
@@ -75,16 +76,18 @@ int Class::arity() {
     return init ? init->arity() : 0;
 }
 
-std::any Class::call(Interpreter &interpreter, std::vector<std::any> arguments) {
-    std::shared_ptr<Instance> instance = std::make_shared<Instance>(*this);
+std::any Class::call(const std::shared_ptr<Callable> &callable, Interpreter &interpreter,
+                     std::vector<std::any> arguments) {
+    std::shared_ptr<Class> class_ = std::dynamic_pointer_cast<Class>(callable);
+    std::shared_ptr<Instance> instance = std::make_shared<Instance>(class_);
     std::shared_ptr<Function> init = get_method("init");
     if (init) {
-        init->bind(instance)->call(interpreter, arguments);
+        init->bind(instance)->call(callable,interpreter, arguments);
     }
     return instance;
 }
 
-::Instance::Instance(Class &clazz) : clazz(clazz) {
+::Instance::Instance(std::shared_ptr<Class> clazz) : clazz(clazz) {
 }
 
 ::Instance::~Instance() {
@@ -99,7 +102,7 @@ std::any Instance::get(const std::shared_ptr<Instance> &instance, const Token &t
     if (fields.contains(token.get_lexeme())) {
         return fields[token.get_lexeme()];
     }
-    std::shared_ptr<Function> function = clazz.get_method(token.get_lexeme());
+    std::shared_ptr<Function> function = clazz->get_method(token.get_lexeme());
     if (function) {
         return function->bind(instance);
     }
@@ -107,5 +110,5 @@ std::any Instance::get(const std::shared_ptr<Instance> &instance, const Token &t
 }
 
 std::string Instance::to_string() const {
-    return clazz.to_string() + " instance";
+    return clazz->to_string() + " instance";
 }

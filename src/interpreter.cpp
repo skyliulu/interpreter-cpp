@@ -351,7 +351,7 @@ std::any Interpreter::do_call(const Expr::Call &expr, std::shared_ptr<Callable> 
                            "Expect " + std::to_string(callable->arity()) + " arguments but got " + std::to_string(
                                parmas.size()) + ".");
     }
-    return callable->call(*this, std::move(parmas));
+    return callable->call(callable, *this, std::move(parmas));
 }
 
 std::any Interpreter::visit(const Expr::Literal &expr)

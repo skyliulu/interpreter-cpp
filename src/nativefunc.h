@@ -13,7 +13,7 @@ public:
     {
         return 0;
     }
-    std::any call(Interpreter &interpreter, std::vector<std::any> arguments) override
+    std::any call(const std::shared_ptr<Callable>& callable, Interpreter &interpreter, std::vector<std::any> arguments) override
     {
         // 获取当前时间点
         auto now = std::chrono::system_clock::now();
