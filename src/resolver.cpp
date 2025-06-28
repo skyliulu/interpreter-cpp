@@ -116,8 +116,17 @@ std::any Resolver::visit(const Stmt::Return &expr)
 std::any Resolver::visit(const Stmt::Class &expr) {
     declare(expr.get_name());
     define(expr.get_name());
+    if (expr.get_super_class()) {
+        if (expr.get_super_class()->get_name().get_lexeme() == expr.get_name().get_lexeme()) {
+            Lox::error(expr.get_name(), "A class can't inherit from itself.");
+        }
+        resolve(*expr.get_super_class());
+        beginScope();
+        scopes.back().emplace("super", Variable(expr.get_super_class()->get_name(), READ));
+    }
+
     ClassType enclosing = current_class;
-    current_class = CLASS_TYPE_CLASS;
+    current_class = expr.get_super_class() ? CLASS_TYPE_SUBCLASS : CLASS_TYPE_CLASS;
     beginScope();
     scopes.back().emplace("this", Variable(expr.get_name(), READ));
     for (const auto& method : expr.get_methods()) {
@@ -125,6 +134,9 @@ std::any Resolver::visit(const Stmt::Class &expr) {
         resolve_function(*method, func_type);
     }
     endScope();
+    if (expr.get_super_class()) {
+        endScope();
+    }
     current_class = enclosing;
     return {};
 }
@@ -203,6 +215,16 @@ std::any Resolver::visit(const Expr::This &expr) {
     if (current_class == CLASS_TYPE_NONE) {
         Lox::error(expr.get_keyword(), "Can't use 'this' outside of class.");
         return {};
+    }
+    resolve_local(expr, expr.get_keyword(), true);
+    return {};
+}
+
+std::any Resolver::visit(const Expr::Super &expr) {
+    if (current_class == CLASS_TYPE_NONE) {
+        Lox::error(expr.get_keyword(), "Can't use 'super' outside of class.");
+    } else if (current_class == CLASS_TYPE_CLASS) {
+        Lox::error(expr.get_keyword(), "Can't use 'super' outside of class.");
     }
     resolve_local(expr, expr.get_keyword(), true);
     return {};

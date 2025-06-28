@@ -49,13 +49,18 @@ std::unique_ptr<Stmt> Parser::declaration() {
 
 std::unique_ptr<Stmt> Parser::class_decl() {
     Token name = consume(TokenType::IDENTIFIER, "Expect name after class.");
+    std::unique_ptr<Expr::Variable> super_class = nullptr;
+    if (match({LESS})) {
+        Token super_name = consume(TokenType::IDENTIFIER, "Expect super class name.");
+        super_class = std::make_unique<Expr::Variable>(super_name);
+    }
     consume(TokenType::LEFT_BRACE, "Expect '{' after class name.");
     std::vector<std::unique_ptr<Stmt::Func> > methods;
     while (!check(TokenType::RIGHT_BRACE)) {
         methods.emplace_back(std::move(func_decl("method")));
     }
     consume(TokenType::RIGHT_BRACE, "Expect '}' after class declaration.");
-    return std::make_unique<Stmt::Class>(name, std::move(methods));
+    return std::make_unique<Stmt::Class>(name, std::move(super_class), std::move(methods));
 }
 
 std::unique_ptr<Stmt::Func> Parser::func_decl(const std::string &kind) {
@@ -367,6 +372,12 @@ std::unique_ptr<Expr> Parser::primary() {
     if (match({THIS})) {
         Token token = previous();
         return std::make_unique<Expr::This>(token);
+    }
+    if (match({SUPER})) {
+        Token token = previous();
+        consume(DOT, "Expect '.' after 'super'.");
+        Token method = consume(IDENTIFIER, "Expect '.' after 'super'.");
+        return std::make_unique<Expr::Super>(token, method);
     }
 
     throw error(peek(), "Expect expression.");

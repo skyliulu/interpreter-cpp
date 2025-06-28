@@ -19,6 +19,7 @@ public:
 	class Get ;
 	class Set ;
 	class This ;
+	class Super ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -38,6 +39,7 @@ public:
 	virtual std::any visit(const Get  &expr) = 0;
 	virtual std::any visit(const Set  &expr) = 0;
 	virtual std::any visit(const This  &expr) = 0;
+	virtual std::any visit(const Super  &expr) = 0;
 };
 
 class Expr::Binary  : public Expr
@@ -233,6 +235,24 @@ public:
 	}
 	~This () {}
 	Token get_keyword() const { return keyword; }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Expr::Super  : public Expr
+{
+private:
+	Token keyword;
+	Token method;
+public:
+	Super (Token keyword, Token method) : keyword(keyword), method(method)
+	{
+	}
+	~Super () {}
+	Token get_keyword() const { return keyword; }
+	Token get_method() const { return method; }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);

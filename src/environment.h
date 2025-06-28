@@ -14,6 +14,7 @@ private:
 public:
     Environment(std::shared_ptr<Environment> enclosing = nullptr) : enclosing(std::move(enclosing)) {}
     ~Environment() {}
+    std::shared_ptr<Environment> get_enclosing() { return enclosing; }
     void define(const std::string &name, const std::any &value)
     {
         values[name] = value; // Define a variable with its value

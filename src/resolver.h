@@ -86,4 +86,5 @@ public:
     std::any visit(const Expr::Get &expr) override;
     std::any visit(const Expr::Set &expr) override;
     std::any visit(const Expr::This &expr) override;
+    std::any visit(const Expr::Super &expr) override;
 };

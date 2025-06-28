@@ -30,6 +30,7 @@ void generate_ast()
         "Get : std::unique_ptr<Expr> object, Token name",
         "Set : std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value",
         "This : Token keyword",
+        "Super : Token keyword, Token method",
     });
     define_ast(outputDir, "Stmt", {
         "Expression : std::unique_ptr<Expr> expression", 
@@ -40,7 +41,7 @@ void generate_ast()
         "While : std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body",
         "Func : Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body",
         "Return : Token keyword, std::unique_ptr<Expr> value",
-        "Class : Token name, std::vector<std::unique_ptr<Stmt::Func>> methods",
+        "Class : Token name, std::unique_ptr<Expr::Variable> super_class, std::vector<std::unique_ptr<Stmt::Func>> methods",
     });
 }
 

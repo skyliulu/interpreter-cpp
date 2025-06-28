@@ -47,8 +47,8 @@ std::string Function::to_string() const {
     return "<fn " + declaration.get_name().get_lexeme() + ">";
 }
 
-::Class::Class(std::string name,
-               std::unordered_map<std::string, std::shared_ptr<Function> > methods) : name(name),
+::Class::Class(std::string name, std::shared_ptr<Class> superclass,
+               std::unordered_map<std::string, std::shared_ptr<Function> > methods) : name(name),superclass(superclass),
     methods(std::move(methods)) {
 }
 
@@ -63,7 +63,9 @@ std::shared_ptr<Function> Class::get_method(const std::string &name) const {
     if (methods.contains(name)) {
         return methods.at(name);
     }
-
+    if (superclass) {
+        return superclass->get_method(name);
+    }
     return nullptr;
 }
 

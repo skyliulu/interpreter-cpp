@@ -28,10 +28,11 @@ public:
 class Class : public Callable {
 private:
     const std::string name;
+    std::shared_ptr<Class> superclass;
     std::unordered_map<std::string, std::shared_ptr<Function> > methods;
 
 public:
-    Class(std::string name,
+    Class(std::string name, std::shared_ptr<Class> superclass,
           std::unordered_map<std::string, std::shared_ptr<Function> > methods);
 
     ~Class();

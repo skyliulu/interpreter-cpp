@@ -192,4 +192,8 @@ public:
     std::any visit(const Expr::This &expr) override {
         return {};
     }
+
+    std::any visit(const Expr::Super &expr) override {
+        return {};
+    }
 };

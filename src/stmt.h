@@ -182,13 +182,15 @@ class Stmt::Class  : public Stmt
 {
 private:
 	Token name;
+	std::unique_ptr<Expr::Variable> super_class;
 	std::vector<std::unique_ptr<Stmt::Func>> methods;
 public:
-	Class (Token name, std::vector<std::unique_ptr<Stmt::Func>> methods) : name(name), methods(std::move(methods))
+	Class (Token name, std::unique_ptr<Expr::Variable> super_class, std::vector<std::unique_ptr<Stmt::Func>> methods) : name(name), super_class(std::move(super_class)), methods(std::move(methods))
 	{
 	}
 	~Class () {}
 	Token get_name() const { return name; }
+	Expr::Variable* get_super_class() const { return super_class.get(); }
 	const std::vector<std::unique_ptr<Stmt::Func>>& get_methods() const { return methods; }
 	std::any accept(Visitor &visitor) const override
 	{

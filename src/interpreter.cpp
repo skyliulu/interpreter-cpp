@@ -113,8 +113,23 @@ void Interpreter::assign_var(Token name, const Expr &expr, std::any value)
 }
 
 std::any Interpreter::visit(const Stmt::Class &expr) {
+    std::shared_ptr<Class> super_class = nullptr;
+    if (expr.get_super_class()) {
+        std::any value = evaluate(*(expr.get_super_class()));
+        if (value.type() != typeid(std::shared_ptr<Class>)) {
+            throw RuntimeError(expr.get_super_class()->get_name(), "Superclass must be a class.");
+        } else {
+            super_class = std::any_cast<std::shared_ptr<Class>>(value);
+        }
+    }
+
     // two-stage variable binding process allows references to the class inside its own methods.
     environment->define(expr.get_name().get_lexeme(), std::any());
+
+    if (expr.get_super_class()) {
+        environment = std::make_shared<Environment>(environment);
+        environment->define("super", super_class);
+    }
 
     std::unordered_map<std::string, std::shared_ptr<Function> > methods;
     for (const auto &method: expr.get_methods()) {
@@ -122,7 +137,10 @@ std::any Interpreter::visit(const Stmt::Class &expr) {
         std::shared_ptr<Function> function = std::make_shared<Function>(*method, environment, is_init);
         methods[method->get_name().get_lexeme()] = function;
     }
-    std::shared_ptr<Callable> class_ = std::make_shared<Class>(expr.get_name().get_lexeme(), std::move(methods));
+    std::shared_ptr<Callable> class_ = std::make_shared<Class>(expr.get_name().get_lexeme(),super_class, std::move(methods));
+    if (expr.get_super_class()) {
+        environment = environment->get_enclosing();
+    }
     environment->assign(expr.get_name(), class_);
     return {};
 }
@@ -368,6 +386,17 @@ std::any Interpreter::visit(const Expr::Get &expr) {
 
 std::any Interpreter::visit(const Expr::This &expr) {
     return lookup_var(expr.get_keyword(),expr);
+}
+
+std::any Interpreter::visit(const Expr::Super &expr) {
+    int distance = locals[&expr];
+    std::shared_ptr<Class> superclass = std::any_cast<std::shared_ptr<Class>>(environment->get_at(distance, "super"));
+    std::shared_ptr<Instance> instance = std::any_cast<std::shared_ptr<Instance>>(environment->get_at(distance - 1, "this"));
+    std::shared_ptr<Function> method = superclass->get_method(expr.get_method().get_lexeme());
+    if (!method) {
+        throw new RuntimeError(expr.get_method(), "Undefined property '" + expr.get_method().get_lexeme() + "'.");
+    }
+    return method->bind(instance);
 }
 
 std::any Interpreter::visit(const Expr::Set &expr) {
