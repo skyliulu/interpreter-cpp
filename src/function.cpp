@@ -48,7 +48,8 @@ std::string Function::to_string() const {
 }
 
 ::Class::Class(std::string name, std::shared_ptr<Class> superclass,
-               std::unordered_map<std::string, std::shared_ptr<Function> > methods) : name(name),superclass(superclass),
+               std::unordered_map<std::string, std::shared_ptr<Function> > methods) : name(name),
+    superclass(superclass),
     methods(std::move(methods)) {
 }
 
@@ -94,25 +95,17 @@ void ::Instance::set(const Token &token, const std::any &value) {
     fields[token.get_lexeme()] = value;
 }
 
-std::any Instance::get(const Token &token) {
+std::any Instance::get(const std::shared_ptr<Instance> &instance, const Token &token) {
     if (fields.contains(token.get_lexeme())) {
         return fields[token.get_lexeme()];
     }
     std::shared_ptr<Function> function = clazz.get_method(token.get_lexeme());
     if (function) {
-        return function;
+        return function->bind(instance);
     }
     throw RuntimeError(token, "Undefined property '" + token.get_lexeme() + "'.");
 }
 
 std::string Instance::to_string() const {
     return clazz.to_string() + " instance";
-}
-
-std::any handle_property(const std::shared_ptr<Instance> &instance, std::any property) {
-    if (property.type() == typeid(std::shared_ptr<Function>)) {
-        const std::shared_ptr<Function> function = std::any_cast<std::shared_ptr<Function> >(property);
-        return function->bind(instance);
-    }
-    return property;
 }

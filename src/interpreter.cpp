@@ -391,7 +391,7 @@ std::any Interpreter::visit(const Expr::Get &expr) {
    std::any object = evaluate(*expr.get_object());
     if (object.type() == typeid(std::shared_ptr<Instance>)) {
         std::shared_ptr<Instance> instance = std::any_cast<std::shared_ptr<Instance>>(object);
-        return handle_property(instance,instance->get(expr.get_name()));
+        return instance->get(instance, expr.get_name());
     }
     throw RuntimeError(expr.get_name(), "Only instances have properties.");
 }

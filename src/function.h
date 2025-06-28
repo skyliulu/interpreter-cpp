@@ -58,9 +58,7 @@ public:
 
     void set(const Token &token, const std::any &value);
 
-    std::any get(const Token &token);
+    std::any get(const std::shared_ptr<Instance> &instance, const Token &token);
 
     std::string to_string() const;
 };
-
-std::any handle_property(const std::shared_ptr<Instance> &instance, std::any property);
