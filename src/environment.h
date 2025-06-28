@@ -68,6 +68,10 @@ public:
             {
                 environment = environment->enclosing.get();
             }
+            else
+            {
+                std::cout << "env is null" << std::endl;
+            }
         }
         return environment;
     }

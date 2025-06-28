@@ -23,7 +23,7 @@ Resolver::Resolver(Interpreter &interpreter) : interpreter(interpreter)
 Resolver::~Resolver()
 {
 }
-void Resolver::resolve(std::vector<std::unique_ptr<Stmt>> stmts)
+void Resolver::resolve(const std::vector<std::unique_ptr<Stmt>> &stmts)
 {
     for (const auto &stmt : stmts)
     {
@@ -37,6 +37,10 @@ void Resolver::resolve(const Stmt &stmt)
 void Resolver::resolve(const Expr &expr)
 {
     expr.accept(*this);
+}
+void Resolver::resolve(const std::unique_ptr<Expr> &expr)
+{
+    expr->accept(*this);
 }
 // stmt visitor methods
 std::any Resolver::visit(const Stmt::Expression &expr)
@@ -89,18 +93,18 @@ std::any Resolver::visit(const Stmt::Func &expr)
 {
     declare(expr.get_name());
     define(expr.get_name());
-    resolve_function(expr, FunctionType::FUNCTION);
+    resolve_function(expr, FunctionType::FUNC_TYPE_FUNCTION);
     return std::any();
 }
 std::any Resolver::visit(const Stmt::Return &expr)
 {
-    if (current_func == FunctionType::NONE)
+    if (current_func == FunctionType::FUNC_TYPE_NONE)
     {
         Lox::error(expr.get_keyword(), "Can't return from top-level code.");
     }
     if (expr.get_value())
     {
-        if (current_func == FunctionType::INITIALIZER)
+        if (current_func == FunctionType::FUNC_TYPE_INITIALIZER)
         {
             Lox::error(expr.get_keyword(), "Can't return a value from an initializer.");
         }
@@ -134,7 +138,7 @@ std::any Resolver::visit(const Expr::Variable &expr)
 {
     if (!scopes.empty())
     {
-        std::unordered_map<std::string, Variable> latest_scope = scopes.back();
+        std::unordered_map<std::string, Variable> &latest_scope = scopes.back();
         if (latest_scope.find(expr.get_name().get_lexeme()) != latest_scope.end())
         {
             Variable variable = latest_scope.at(expr.get_name().get_lexeme());
@@ -174,7 +178,7 @@ void Resolver::beginScope()
 }
 void Resolver::endScope()
 {
-    std::unordered_map<std::string, Variable> scope = scopes.back();
+    std::unordered_map<std::string, Variable> &scope = scopes.back();
     scopes.pop_back();
     for (const auto &pair : scope)
     {
@@ -190,12 +194,12 @@ void Resolver::declare(Token name)
     {
         return;
     }
-    std::unordered_map<std::string, Variable> scope = scopes.back();
+    std::unordered_map<std::string, Variable> &scope = scopes.back();
     if (scope.find(name.get_lexeme()) != scope.end())
     {
         Lox::error(name, "Already a variable with this name in this scope.");
     }
-    scope.emplace(name.get_lexeme(), Variable(name, VariableState::DEFINED));
+    scope.emplace(name.get_lexeme(), Variable(name, VariableState::DECLARED));
 }
 void Resolver::define(Token name)
 {
@@ -207,14 +211,15 @@ void Resolver::define(Token name)
 }
 void Resolver::resolve_local(const Expr &expr, Token name, bool isRead)
 {
-    for (int i = scopes.size() - 1; i >= 0; i--)
+    for (size_t i = scopes.size() - 1; i >= 0; i--)
     {
-        if (scopes[i].find(name.get_lexeme()) != scopes[i].end())
+        auto it = scopes[i].find(name.get_lexeme());
+        if (it != scopes[i].end())
         {
             interpreter.resolve(expr, scopes.size() - i - 1);
             if (isRead)
             {
-                scopes[i][name.get_lexeme()].set_state(VariableState::READ);
+                it->second.set_state(VariableState::READ);
             }
             return;
         }

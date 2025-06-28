@@ -60,6 +60,7 @@ void define_ast(const std::string &outputDir, const std::string &className, cons
     }
     out << "#include <memory>\n";
     out << "#include <any>\n";
+    out << "#include <vector>\n";
     out << "class " << className << "\n{\npublic:\n";
     out << "\t" << className << "() {}\n";
     out << "\t~" << className << "() {}\n";

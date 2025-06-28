@@ -5,17 +5,17 @@
 #include <vector>
 enum ClassType
 {
-    NONE,
-    CLASS,
-    SUBCLASS
+    CLASS_TYPE_NONE,
+    CLASS_TYPE_CLASS,
+    CLASS_TYPE_SUBCLASS
 };
 
 enum FunctionType
 {
-    NONE,
-    FUNCTION,
-    METHOD,
-    INITIALIZER
+    FUNC_TYPE_NONE,
+    FUNC_TYPE_FUNCTION,
+    FUNC_TYPE_METHOD,
+    FUNC_TYPE_INITIALIZER
 };
 
 enum VariableState
@@ -46,8 +46,8 @@ private:
     /* data */
     Interpreter &interpreter;
     std::vector<std::unordered_map<std::string, Variable>> scopes;
-    FunctionType current_func = FunctionType::NONE;
-    ClassType current_class = ClassType::NONE;
+    FunctionType current_func = FunctionType::FUNC_TYPE_NONE;
+    ClassType current_class = ClassType::CLASS_TYPE_NONE;
     bool in_loop = false;
     /* funcs */
     void beginScope();
@@ -60,9 +60,10 @@ private:
 public:
     Resolver(Interpreter &interpreter);
     ~Resolver();
-    void resolve(std::vector<std::unique_ptr<Stmt>> stmts);
+    void resolve(const std::vector<std::unique_ptr<Stmt>>& stmts);
     void resolve(const Stmt &stmt);
     void resolve(const Expr &expr);
+    void resolve(const std::unique_ptr<Expr>& expr);
     // stmt visitor methods
     std::any visit(const Stmt::Expression &expr) override;
     std::any visit(const Stmt::Print &expr) override;

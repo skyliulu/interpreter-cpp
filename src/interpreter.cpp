@@ -83,7 +83,7 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
 
 void Interpreter::resolve(const Expr &expr, int deep)
 {
-    locals.emplace(expr, deep);
+    locals.emplace(&expr, deep);
 }
 
 std::any Interpreter::lookup_var(Token name, const Expr &expr)
