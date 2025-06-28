@@ -66,6 +66,7 @@ std::any Interpreter::evaluate(const Expr &expr)
 
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, const std::shared_ptr<Environment> &env)
 {
+    // 使用guard的方式可以保证函数结束时可以将env充值回去
     EnvironmentGuard guard(*this, env); // Create a new environment for the block
     try
     {
@@ -77,6 +78,37 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     catch (const RuntimeError &e)
     {
         throw; // Re-throw the error
+    }
+}
+
+void Interpreter::resolve(const Expr &expr, int deep)
+{
+    locals.emplace(expr, deep);
+}
+
+std::any Interpreter::lookup_var(Token name, const Expr &expr)
+{
+    if (locals.find(&expr) != locals.end())
+    {
+        int distance = locals[&expr];
+        return environment->get_at(distance, name.get_lexeme());
+    }
+    else
+    {
+        return global->get(name);
+    }
+}
+
+void Interpreter::assign_var(Token name, const Expr &expr, std::any value)
+{
+    if (locals.find(&expr) != locals.end())
+    {
+        int distance = locals[&expr];
+        return environment->assign_at(distance, name, value);
+    }
+    else
+    {
+        return global->assign(name, value);
     }
 }
 

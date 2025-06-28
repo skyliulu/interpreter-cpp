@@ -4,6 +4,7 @@
 #include "parser.h"
 #include "astprinter.h"
 #include "interpreter.h"
+#include "resolver.h"
 
 class Lox
 {

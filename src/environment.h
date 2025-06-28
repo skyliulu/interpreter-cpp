@@ -16,12 +16,6 @@ public:
     ~Environment() {}
     void define(const std::string &name, const std::any &value)
     {
-        // std::cout << "define " << name;
-        // if (value.type() == typeid(double))
-        // {
-        //     std::cout << " " << std::any_cast<double>(value);
-        // }
-        // std::cout << std::endl;
         values[name] = value; // Define a variable with its value
     }
     void assign(const Token &token, const std::any &value)
@@ -44,12 +38,6 @@ public:
         auto it = values.find(token.get_lexeme()); // Find the variable by its name
         if (it != values.end())
         {
-            // std::cout << "get " << token.get_lexeme();
-            // if (it->second.type() == typeid(double))
-            // {
-            //     std::cout << " " << std::any_cast<double>(it->second) ;
-            // }
-            // std::cout << std::endl;
             return it->second; // Return the value of the variable
         }
         if (enclosing)
@@ -69,5 +57,28 @@ public:
             ptr = ptr->enclosing;
         }
         return deep;
+    }
+
+    Environment *ancestor(int distance)
+    {
+        Environment *environment = this;
+        for (int i = 0; i < distance; i++)
+        {
+            if (environment != nullptr)
+            {
+                environment = environment->enclosing.get();
+            }
+        }
+        return environment;
+    }
+
+    std::any get_at(int distance, std::string name)
+    {
+        return ancestor(distance)->values.at(name);
+    }
+
+    void assign_at(int distance, Token name, std::any value)
+    {
+        ancestor(distance)->values.emplace(name.get_lexeme(), value);
     }
 };

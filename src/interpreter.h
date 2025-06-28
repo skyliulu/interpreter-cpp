@@ -5,6 +5,7 @@
 #include "stmt.h"
 #include "runtime_error.h"
 #include "environment.h"
+#include <unordered_map>
 
 class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
@@ -33,6 +34,9 @@ private:
         EnvironmentGuard(const EnvironmentGuard &) = delete;
         EnvironmentGuard &operator=(const EnvironmentGuard &) = delete;
     };
+    std::unordered_map<const Expr*, int> locals;
+    std::any lookup_var(Token name, const Expr& expr);
+    void assign_var(Token name, const Expr& expr, std::any value);
 
 public:
     Interpreter(/* args */);
@@ -40,6 +44,7 @@ public:
     void interpret(const Expr &expr);
     void interpret(const std::vector<std::unique_ptr<Stmt>> &stmts);
     void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts, const std::shared_ptr<Environment> &env);
+    void resolve(const Expr &expr, int deep);
     // stmt visitor methods
     std::any visit(const Stmt::Expression &expr) override;
     std::any visit(const Stmt::Print &expr) override;

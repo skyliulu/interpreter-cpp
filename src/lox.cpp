@@ -113,6 +113,9 @@ void Lox::run(const std::string &source)
     // printer.print(statements);
 
     Interpreter interpreter;
+    Resolver resolver(interpreter);
+    resolver.resolve(statements);
+
     interpreter.interpret(statements);
     if (had_runtime_error)
     {
