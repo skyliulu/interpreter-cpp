@@ -66,13 +66,14 @@ private:
     std::unique_ptr<Stmt> for_stmt();
     std::unique_ptr<Stmt> return_stmt();
     /* parse decl */
-    // func_decl | var_decl | statement
+    // class_decl | func_decl | var_decl | statement
     std::unique_ptr<Stmt> declaration();
     // "var" IDENTIFIER ("=" expr)? ";"
     std::unique_ptr<Stmt> var_decl();
     // "func" IDENTIFIER "(" params? ")" block_stmt
-    std::unique_ptr<Stmt> func_decl();
-
+    std::unique_ptr<Stmt::Func> func_decl(const std::string& kind);
+    // "class" IDENTIFIER "{" func* "}"
+    std::unique_ptr<Stmt> class_decl();
     /* helper functions */
     bool is_at_end();
     bool check(TokenType type);

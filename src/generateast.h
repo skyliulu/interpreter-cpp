@@ -36,7 +36,8 @@ void generate_ast()
         "If : std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, std::unique_ptr<Stmt> elseBranch",
         "While : std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body",
         "Func : Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body",
-        "Return : Token keyword, std::unique_ptr<Expr> value"
+        "Return : Token keyword, std::unique_ptr<Expr> value",
+        "Class : Token name, std::vector<std::unique_ptr<Stmt::Func>> methods",
     });
 }
 

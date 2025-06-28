@@ -113,6 +113,18 @@ std::any Resolver::visit(const Stmt::Return &expr)
 
     return {};
 }
+std::any Resolver::visit(const Stmt::Class &expr) {
+    declare(expr.get_name());
+    define(expr.get_name());
+    beginScope();
+    scopes.back().emplace("this", Variable(expr.get_name(), READ));
+    for (const auto& method : expr.get_methods()) {
+        FunctionType func_type = method->get_name().get_lexeme() == "init" ? FunctionType::FUNC_TYPE_INITIALIZER : FunctionType::FUNC_TYPE_METHOD;
+        resolve_function(*method, func_type);
+    }
+    endScope();
+    return {};
+}
 // expr visitor methods
 std::any Resolver::visit(const Expr::Binary &expr)
 {

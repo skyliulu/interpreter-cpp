@@ -1,8 +1,8 @@
 #pragma once
 #include "expr.h"
 #include <memory>
-#include <vector>
 #include <any>
+#include <vector>
 class Stmt
 {
 public:
@@ -16,6 +16,7 @@ public:
 	class While ;
 	class Func ;
 	class Return ;
+	class Class ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -32,6 +33,7 @@ public:
 	virtual std::any visit(const While  &expr) = 0;
 	virtual std::any visit(const Func  &expr) = 0;
 	virtual std::any visit(const Return  &expr) = 0;
+	virtual std::any visit(const Class  &expr) = 0;
 };
 
 class Stmt::Expression  : public Stmt
@@ -170,6 +172,24 @@ public:
 	~Return () {}
 	Token get_keyword() const { return keyword; }
 	Expr* get_value() const { return value.get(); }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Stmt::Class  : public Stmt
+{
+private:
+	Token name;
+	std::vector<std::unique_ptr<Stmt::Func>> methods;
+public:
+	Class (Token name, std::vector<std::unique_ptr<Stmt::Func>> methods) : name(name), methods(std::move(methods))
+	{
+	}
+	~Class () {}
+	Token get_name() const { return name; }
+	const std::vector<std::unique_ptr<Stmt::Func>>& get_methods() const { return methods; }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);

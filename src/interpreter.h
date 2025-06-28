@@ -54,6 +54,7 @@ public:
     std::any visit(const Stmt::While &expr) override;
     std::any visit(const Stmt::Func &expr) override;
     std::any visit(const Stmt::Return &expr) override;
+    std::any visit(const Stmt::Class &expr) override;
     // expr visitor methods
     std::any visit(const Expr::Binary &expr) override;
     std::any visit(const Expr::Unary &expr) override;

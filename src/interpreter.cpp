@@ -112,6 +112,20 @@ void Interpreter::assign_var(Token name, const Expr &expr, std::any value)
     }
 }
 
+std::any Interpreter::visit(const Stmt::Class &expr) {
+    // two-stage variable binding process allows references to the class inside its own methods.
+    environment->define(expr.get_name().get_lexeme(), std::any());
+
+    std::unordered_map<std::string, std::shared_ptr<Function> > methods;
+    for (const auto &method: expr.get_methods()) {
+        std::shared_ptr<Function> function = std::make_shared<Function>(*method, environment);
+        methods[method->get_name().get_lexeme()] = function;
+    }
+    std::shared_ptr<Class> class_ = std::make_shared<Class>(expr.get_name().get_lexeme(), std::move(methods));
+    environment->assign(expr.get_name(), class_);
+    return {};
+}
+
 std::any Interpreter::visit(const Stmt::Return &expr)
 {
     if (expr.get_value())
@@ -363,6 +377,9 @@ std::string Interpreter::stringify(const std::any &value)
     else if (value.type() == typeid(std::shared_ptr<Callable>))
     {
         return std::any_cast<std::shared_ptr<Callable>>(value)->to_string();
+    }
+    else if (value.type() == typeid(std::shared_ptr<Class>)) {
+        return std::any_cast<std::shared_ptr<Class>>(value)->to_string();
     }
     return "unknown";
 }
