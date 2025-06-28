@@ -115,7 +115,11 @@ void Lox::run(const std::string &source)
     Interpreter interpreter;
     Resolver resolver(interpreter);
     resolver.resolve(statements);
-
+    if (had_error)
+    {
+        exit(65); // Exit with an error code if there was an error
+        return;
+    }
     interpreter.interpret(statements);
     if (had_runtime_error)
     {
