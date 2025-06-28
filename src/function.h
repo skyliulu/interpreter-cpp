@@ -16,7 +16,7 @@ public:
 
     int arity() override;
 
-    std::shared_ptr<Function> bind(Instance instance);
+    std::shared_ptr<Callable> bind(Instance instance);
 
     std::any call(Interpreter &interpreter, std::vector<std::any> arguments) override;
 

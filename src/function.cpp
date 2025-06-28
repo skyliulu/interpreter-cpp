@@ -14,7 +14,7 @@ int ::Function::arity() {
     return declaration.get_params().size();
 }
 
-std::shared_ptr<Function> Function::bind(Instance instance) {
+std::shared_ptr<Callable> Function::bind(Instance instance) {
     std::shared_ptr<Environment> env = std::make_shared<Environment>(enclosing);
     env->define("this", instance);
     return std::make_shared<Function>(declaration, env);
