@@ -7,6 +7,8 @@
 #include "environment.h"
 #include <unordered_map>
 
+class Callable;
+
 class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
 private:
@@ -37,6 +39,7 @@ private:
     std::unordered_map<const Expr*, int> locals;
     std::any lookup_var(Token name, const Expr& expr);
     void assign_var(Token name, const Expr& expr, std::any value);
+    std::any do_call(const Expr::Call &expr, std::shared_ptr<Callable> &callable,std::vector<std::any> &parmas);
 
 public:
     Interpreter(/* args */);

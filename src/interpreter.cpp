@@ -137,7 +137,7 @@ std::any Interpreter::visit(const Stmt::Class &expr) {
         std::shared_ptr<Function> function = std::make_shared<Function>(*method, environment, is_init);
         methods[method->get_name().get_lexeme()] = function;
     }
-    std::shared_ptr<Callable> class_ = std::make_shared<Class>(expr.get_name().get_lexeme(),super_class, std::move(methods));
+    std::shared_ptr<Class> class_ = std::make_shared<Class>(expr.get_name().get_lexeme(),super_class, std::move(methods));
     if (expr.get_super_class()) {
         environment = environment->get_enclosing();
     }
@@ -161,7 +161,7 @@ std::any Interpreter::visit(const Stmt::Return &expr)
 
 std::any Interpreter::visit(const Stmt::Func &expr)
 {
-    std::shared_ptr<Callable> function_ptr = std::make_shared<Function>(expr, environment, false);
+    std::shared_ptr<Function> function_ptr = std::make_shared<Function>(expr, environment, false);
     environment->define(expr.get_name().get_lexeme(), function_ptr);
     return function_ptr;
 }
@@ -318,8 +318,7 @@ std::any Interpreter::visit(const Expr::Unary &expr)
     }
 }
 
-std::any Interpreter::visit(const Expr::Call &expr)
-{
+std::any Interpreter::visit(const Expr::Call &expr) {
     std::any callee = evaluate(*expr.get_callee());
     std::vector<std::any> parmas;
     for (const auto &arg : expr.get_arguments())
@@ -327,19 +326,32 @@ std::any Interpreter::visit(const Expr::Call &expr)
         parmas.push_back(evaluate(*arg));
     }
     // std::cout << callee.type().name() << std::endl;
-    if (callee.type() == typeid(std::shared_ptr<Callable>))
-    {
-        std::shared_ptr<Callable> callable = std::any_cast<std::shared_ptr<Callable>>(callee);
-        if (parmas.size() != callable->arity())
-        {
-            throw RuntimeError(expr.get_paren(), "Expect " + std::to_string(callable->arity()) + " arguments but got " + std::to_string(parmas.size()) + ".");
-        }
-        return callable->call(*this, std::move(parmas));
+    if (callee.type() == typeid(std::shared_ptr<Callable>)) {
+        std::shared_ptr<Callable> callable = std::any_cast<std::shared_ptr<Callable> >(callee);
+        return do_call(expr, callable, parmas);
+    } else if (callee.type() == typeid(std::shared_ptr<Function>)) {
+        std::shared_ptr<Function> function = std::any_cast<std::shared_ptr<Function> >(callee);
+        std::shared_ptr<Callable> callable = function;
+        return do_call(expr, callable, parmas);
+    } else if (callee.type() == typeid(std::shared_ptr<Class>)) {
+        std::shared_ptr<Class> class_ = std::any_cast<std::shared_ptr<Class> >(callee);
+        std::shared_ptr<Callable> callable = class_;
+        return do_call(expr, callable, parmas);
     }
     else
     {
         throw RuntimeError(expr.get_paren(), "Can only call functions and classes.");
     }
+}
+
+std::any Interpreter::do_call(const Expr::Call &expr, std::shared_ptr<Callable> &callable,
+                              std::vector<std::any> &parmas) {
+    if (parmas.size() != callable->arity()) {
+        throw RuntimeError(expr.get_paren(),
+                           "Expect " + std::to_string(callable->arity()) + " arguments but got " + std::to_string(
+                               parmas.size()) + ".");
+    }
+    return callable->call(*this, std::move(parmas));
 }
 
 std::any Interpreter::visit(const Expr::Literal &expr)
@@ -437,6 +449,9 @@ std::string Interpreter::stringify(const std::any &value)
     }
     else if (value.type() == typeid(std::shared_ptr<Instance>)) {
         return std::any_cast<std::shared_ptr<Instance>>(value)->to_string();
+    }
+    else if (value.type() == typeid(std::shared_ptr<Function>)) {
+        return std::any_cast<std::shared_ptr<Function>>(value)->to_string();
     }
     return "unknown";
 }
