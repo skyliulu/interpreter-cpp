@@ -136,7 +136,7 @@ std::any Interpreter::visit(const Stmt::Func &expr)
 std::any Interpreter::visit(const Stmt::Block &expr)
 {
     execute_block(expr.get_statements(), std::make_shared<Environment>(environment));
-    return std::any(); // Return an empty std::any as the return type is std::any
+    return {}; // Return an empty std::any as the return type is std::any
 }
 
 std::any Interpreter::visit(const Stmt::Expression &expr)

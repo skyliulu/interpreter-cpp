@@ -83,6 +83,6 @@ public:
 
     void assign_at(int distance, Token name, std::any value)
     {
-        ancestor(distance)->values.emplace(name.get_lexeme(), value);
+        ancestor(distance)->values[name.get_lexeme()] = value;
     }
 };

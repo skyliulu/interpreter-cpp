@@ -180,13 +180,13 @@ void Resolver::endScope()
 {
     std::unordered_map<std::string, Variable> &scope = scopes.back();
     scopes.pop_back();
-    for (const auto &pair : scope)
-    {
-        if (pair.second.get_state() != VariableState::READ)
-        {
-            Lox::error(pair.second.get_name(), "Local variable is not used.");
-        }
-    }
+    // for (const auto &pair : scope)
+    // {
+    //     if (pair.second.get_state() != VariableState::READ)
+    //     {
+    //         Lox::error(pair.second.get_name(), "Local variable is not used.");
+    //     }
+    // }
 }
 void Resolver::declare(Token name)
 {
