@@ -356,6 +356,26 @@ std::any Interpreter::visit(const Expr::Grouping &expr)
     return evaluate(*(expr.get_expression()));
 }
 
+std::any Interpreter::visit(const Expr::Get &expr) {
+   std::any object = evaluate(*expr.get_object());
+    if (object.type() == typeid(std::shared_ptr<Instance>)) {
+        std::shared_ptr<Instance> instance = std::any_cast<std::shared_ptr<Instance>>(object);
+        return instance->get(expr.get_name());
+    }
+    throw RuntimeError(expr.get_name(), "Only instances have properties.");
+}
+
+std::any Interpreter::visit(const Expr::Set &expr) {
+    std::any object = evaluate(*expr.get_object());
+    if (object.type() == typeid(std::shared_ptr<Instance>)) {
+        std::shared_ptr<Instance> instance = std::any_cast<std::shared_ptr<Instance> >(object);
+        std::any value = evaluate(*expr.get_value());
+        instance->set(expr.get_name(), value);
+        return {};
+    }
+    throw RuntimeError(expr.get_name(), "Only instances have properties.");
+}
+
 std::string Interpreter::stringify(const std::any &value)
 {
     if (value.type() == typeid(std::nullptr_t) || !value.has_value())

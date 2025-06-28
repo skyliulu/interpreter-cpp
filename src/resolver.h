@@ -83,4 +83,6 @@ public:
     std::any visit(const Expr::Assign &expr) override;
     std::any visit(const Expr::Logical &expr) override;
     std::any visit(const Expr::Call &expr) override;
+    std::any visit(const Expr::Get &expr) override;
+    std::any visit(const Expr::Set &expr) override;
 };

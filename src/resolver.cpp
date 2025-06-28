@@ -184,6 +184,18 @@ std::any Resolver::visit(const Expr::Call &expr)
     }
     return {};
 }
+
+std::any Resolver::visit(const Expr::Get &expr) {
+    resolve(*expr.get_object());
+    return {};
+}
+
+std::any Resolver::visit(const Expr::Set &expr) {
+    resolve(*expr.get_object());
+    resolve(*expr.get_value());
+    return {};
+}
+
 void Resolver::beginScope()
 {
     scopes.emplace_back();

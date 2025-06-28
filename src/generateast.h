@@ -26,7 +26,9 @@ void generate_ast()
         "Variable : Token name",
         "Assign : Token name, std::unique_ptr<Expr> value",
         "Logical : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right",
-        "Call : std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments"
+        "Call : std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments",
+        "Get      : std::unique_ptr<Expr> object, Token name",
+        "Set      : std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value",
     });
     define_ast(outputDir, "Stmt", {
         "Expression : std::unique_ptr<Expr> expression", 

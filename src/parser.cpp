@@ -221,9 +221,11 @@ std::unique_ptr<Expr> Parser::assignment() {
     if (match({TokenType::EQUAL})) {
         Token equals = previous();
         std::unique_ptr<Expr> value = assignment();
-        if (auto varExpr = dynamic_cast<Expr::Variable *>(expr.get())) {
+        if (const auto varExpr = dynamic_cast<Expr::Variable *>(expr.get())) {
             Token name = varExpr->get_name();
             return std::make_unique<Expr::Assign>(name, std::move(value));
+        } else if (const auto get_expr = dynamic_cast<Expr::Get *>(expr.get())) {
+            return std::make_unique<Expr::Set>(std::move(get_expr->get_object_ptr()),get_expr->get_name(),std::move(value));
         }
         throw error(equals, "Invalid assignment target.");
     }
@@ -313,18 +315,25 @@ std::unique_ptr<Expr> Parser::unary() {
 
 std::unique_ptr<Expr> Parser::call() {
     std::unique_ptr<Expr> expr = primary();
-    while (match({TokenType::LEFT_PAREN})) {
-        std::vector<std::unique_ptr<Expr> > args;
-        if (!check(TokenType::RIGHT_PAREN)) {
-            do {
-                if (args.size() >= 255) {
-                    error(peek(), "Can't have more than 255 augments.");
-                }
-                args.emplace_back(expresstion());
-            } while (match({TokenType::COMMA}));
+    while (true) {
+        if (match({LEFT_PAREN})) {
+            std::vector<std::unique_ptr<Expr> > args;
+            if (!check(TokenType::RIGHT_PAREN)) {
+                do {
+                    if (args.size() >= 255) {
+                        error(peek(), "Can't have more than 255 augments.");
+                    }
+                    args.emplace_back(expresstion());
+                } while (match({TokenType::COMMA}));
+            }
+            consume(TokenType::RIGHT_PAREN, "Expect ')' after augments.");
+            expr = std::make_unique<Expr::Call>(std::move(expr), previous(), std::move(args));
+        } else if (match({DOT})) {
+            Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+            expr = std::make_unique<Expr::Get>(std::move(expr),name);
+        } else {
+            break;
         }
-        consume(TokenType::RIGHT_PAREN, "Expect ')' after augments.");
-        expr = std::make_unique<Expr::Call>(std::move(expr), previous(), std::move(args));
     }
     return expr;
 }

@@ -181,4 +181,11 @@ public:
         return std::any(); 
     }
 
+    std::any visit(const Expr::Get &expr) override {
+        return {};
+    }
+
+    std::any visit(const Expr::Set &expr) override {
+        return {};
+    }
 };
