@@ -143,7 +143,7 @@ std::any Interpreter::visit(const Stmt::Return &expr)
 
 std::any Interpreter::visit(const Stmt::Func &expr)
 {
-    std::shared_ptr<Callable> function_ptr = std::make_shared<Function>(expr, environment);
+    std::shared_ptr<Callable> function_ptr = std::make_shared<Function>(expr, environment, false);
     environment->define(expr.get_name().get_lexeme(), function_ptr);
     return function_ptr;
 }
