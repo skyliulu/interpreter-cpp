@@ -3,8 +3,9 @@
 //
 #include "function.h"
 
-Function::Function(const Stmt::Func &declaration, std::shared_ptr<Environment> enclosing) : declaration(declaration),
-    enclosing(enclosing) {
+Function::Function(const Stmt::Func &declaration, std::shared_ptr<Environment> enclosing,
+                   bool is_init) : declaration(declaration),
+                                   enclosing(enclosing), is_init(is_init) {
 }
 
 ::Function::~Function() {
@@ -17,7 +18,7 @@ int ::Function::arity() {
 std::shared_ptr<Callable> Function::bind(std::shared_ptr<Instance> instance) {
     std::shared_ptr<Environment> env = std::make_shared<Environment>(enclosing);
     env->define("this", instance);
-    return std::make_shared<Function>(declaration, env);
+    return std::make_shared<Function>(declaration, env, is_init);
 }
 
 std::any Function::call(Interpreter &interpreter, std::vector<std::any> arguments) {
@@ -29,9 +30,15 @@ std::any Function::call(Interpreter &interpreter, std::vector<std::any> argument
 
     try {
         interpreter.execute_block(declaration.get_body(), env);
+        if (is_init) {
+            return enclosing->get_at(0, "this");
+        }
         return std::any();
     } catch (const Return &return_stmt) {
         // std::cout << "return from deep " << env->deepth() << std::endl;
+        if (is_init) {
+            return enclosing->get_at(0, "this");
+        }
         return return_stmt.get_value();
     }
 }
@@ -61,16 +68,20 @@ std::shared_ptr<Function> Class::get_method(const std::string &name) const {
 }
 
 int Class::arity() {
-    return 0;
+    std::shared_ptr<Function> init = get_method("init");
+    return init ? init->arity() : 0;
 }
 
 std::any Class::call(Interpreter &interpreter, std::vector<std::any> arguments) {
-
     std::shared_ptr<Instance> instance = std::make_shared<Instance>(*this);
+    std::shared_ptr<Function> init = get_method("init");
+    if (init) {
+        init->bind(instance)->call(interpreter, arguments);
+    }
     return instance;
 }
 
-::Instance::Instance( Class &clazz) : clazz(clazz) {
+::Instance::Instance(Class &clazz) : clazz(clazz) {
 }
 
 ::Instance::~Instance() {
@@ -98,9 +109,8 @@ std::string Instance::to_string() const {
 
 std::any handle_property(const std::shared_ptr<Instance> &instance, std::any property) {
     if (property.type() == typeid(std::shared_ptr<Function>)) {
-        const std::shared_ptr<Function> function = std::any_cast<std::shared_ptr<Function>>(property);
+        const std::shared_ptr<Function> function = std::any_cast<std::shared_ptr<Function> >(property);
         return function->bind(instance);
     }
     return property;
 }
-

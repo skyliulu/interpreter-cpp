@@ -8,9 +8,10 @@ private:
     /* data */
     const Stmt::Func &declaration;
     std::shared_ptr<Environment> enclosing;
+    bool is_init;
 
 public:
-    Function(const Stmt::Func &declaration, std::shared_ptr<Environment> enclosing);
+    Function(const Stmt::Func &declaration, std::shared_ptr<Environment> enclosing, bool is_init);
 
     ~Function();
 

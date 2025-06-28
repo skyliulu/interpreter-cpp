@@ -118,7 +118,8 @@ std::any Interpreter::visit(const Stmt::Class &expr) {
 
     std::unordered_map<std::string, std::shared_ptr<Function> > methods;
     for (const auto &method: expr.get_methods()) {
-        std::shared_ptr<Function> function = std::make_shared<Function>(*method, environment);
+        bool is_init = method->get_name().get_lexeme() == "init";
+        std::shared_ptr<Function> function = std::make_shared<Function>(*method, environment, is_init);
         methods[method->get_name().get_lexeme()] = function;
     }
     std::shared_ptr<Callable> class_ = std::make_shared<Class>(expr.get_name().get_lexeme(), std::move(methods));
