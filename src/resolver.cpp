@@ -116,6 +116,8 @@ std::any Resolver::visit(const Stmt::Return &expr)
 std::any Resolver::visit(const Stmt::Class &expr) {
     declare(expr.get_name());
     define(expr.get_name());
+    ClassType enclosing = current_class;
+    current_class = CLASS_TYPE_CLASS;
     beginScope();
     scopes.back().emplace("this", Variable(expr.get_name(), READ));
     for (const auto& method : expr.get_methods()) {
@@ -123,6 +125,7 @@ std::any Resolver::visit(const Stmt::Class &expr) {
         resolve_function(*method, func_type);
     }
     endScope();
+    current_class = enclosing;
     return {};
 }
 // expr visitor methods
@@ -193,6 +196,15 @@ std::any Resolver::visit(const Expr::Get &expr) {
 std::any Resolver::visit(const Expr::Set &expr) {
     resolve(*expr.get_object());
     resolve(*expr.get_value());
+    return {};
+}
+
+std::any Resolver::visit(const Expr::This &expr) {
+    if (current_class == CLASS_TYPE_NONE) {
+        Lox::error(expr.get_keyword(), "Can't use 'this' outside of class.");
+        return {};
+    }
+    resolve_local(expr, expr.get_keyword(), true);
     return {};
 }
 

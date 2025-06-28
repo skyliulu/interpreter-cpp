@@ -364,6 +364,10 @@ std::unique_ptr<Expr> Parser::primary() {
     if (match({TokenType::IDENTIFIER})) {
         return std::make_unique<Expr::Variable>(previous());
     }
+    if (match({THIS})) {
+        Token token = previous();
+        return std::make_unique<Expr::This>(token);
+    }
 
     throw error(peek(), "Expect expression.");
 }

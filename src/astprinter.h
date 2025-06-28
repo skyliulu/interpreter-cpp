@@ -188,4 +188,8 @@ public:
     std::any visit(const Expr::Set &expr) override {
         return {};
     }
+
+    std::any visit(const Expr::This &expr) override {
+        return {};
+    }
 };

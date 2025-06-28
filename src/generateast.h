@@ -27,8 +27,9 @@ void generate_ast()
         "Assign : Token name, std::unique_ptr<Expr> value",
         "Logical : std::unique_ptr<Expr> left, Token operator_, std::unique_ptr<Expr> right",
         "Call : std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments",
-        "Get      : std::unique_ptr<Expr> object, Token name",
-        "Set      : std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value",
+        "Get : std::unique_ptr<Expr> object, Token name",
+        "Set : std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value",
+        "This : Token keyword",
     });
     define_ast(outputDir, "Stmt", {
         "Expression : std::unique_ptr<Expr> expression", 
@@ -162,10 +163,11 @@ void define_type(std::ofstream &out, const std::string &baseClass, const std::st
         else if(fieldType.find("std::vector") == 0)
         {
             fieldType = "const " + fieldType + "&"; // Remove "std::vector<" and ">"
-        } 
-        
-        
+        }
         out << "\t" << fieldType << " " << fieldMethod << "() const { return " << fieldName << "; }\n";
+    }
+    if (className=="Get ") {
+        out << "\t std::unique_ptr<Expr>  get_object_ptr()  { return std::move(object); }" << std::endl;
     }
 
     // accept method

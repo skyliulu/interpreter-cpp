@@ -16,8 +16,9 @@ public:
 	class Assign ;
 	class Logical ;
 	class Call ;
-	class Get      ;
-	class Set      ;
+	class Get ;
+	class Set ;
+	class This ;
 	class Visitor;
 	virtual std::any accept(Visitor &visitor) const = 0;
 };
@@ -34,8 +35,9 @@ public:
 	virtual std::any visit(const Assign  &expr) = 0;
 	virtual std::any visit(const Logical  &expr) = 0;
 	virtual std::any visit(const Call  &expr) = 0;
-	virtual std::any visit(const Get       &expr) = 0;
-	virtual std::any visit(const Set       &expr) = 0;
+	virtual std::any visit(const Get  &expr) = 0;
+	virtual std::any visit(const Set  &expr) = 0;
+	virtual std::any visit(const This  &expr) = 0;
 };
 
 class Expr::Binary  : public Expr
@@ -182,39 +184,55 @@ public:
 	}
 };
 
-class Expr::Get       : public Expr
+class Expr::Get  : public Expr
 {
 private:
 	std::unique_ptr<Expr> object;
 	Token name;
 public:
-	Get      (std::unique_ptr<Expr> object, Token name) : object(std::move(object)), name(name)
+	Get (std::unique_ptr<Expr> object, Token name) : object(std::move(object)), name(name)
 	{
 	}
-	~Get      () {}
+	~Get () {}
 	Expr* get_object() const { return object.get(); }
-	std::unique_ptr<Expr>  get_object_ptr()  { return std::move(object); }
 	Token get_name() const { return name; }
+	 std::unique_ptr<Expr>  get_object_ptr()  { return std::move(object); }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);
 	}
 };
 
-class Expr::Set       : public Expr
+class Expr::Set  : public Expr
 {
 private:
 	std::unique_ptr<Expr> object;
 	Token name;
 	std::unique_ptr<Expr> value;
 public:
-	Set      (std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value) : object(std::move(object)), name(name), value(std::move(value))
+	Set (std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value) : object(std::move(object)), name(name), value(std::move(value))
 	{
 	}
-	~Set      () {}
+	~Set () {}
 	Expr* get_object() const { return object.get(); }
 	Token get_name() const { return name; }
 	Expr* get_value() const { return value.get(); }
+	std::any accept(Visitor &visitor) const override
+	{
+		return visitor.visit(*this);
+	}
+};
+
+class Expr::This  : public Expr
+{
+private:
+	Token keyword;
+public:
+	This (Token keyword) : keyword(keyword)
+	{
+	}
+	~This () {}
+	Token get_keyword() const { return keyword; }
 	std::any accept(Visitor &visitor) const override
 	{
 		return visitor.visit(*this);

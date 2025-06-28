@@ -365,6 +365,10 @@ std::any Interpreter::visit(const Expr::Get &expr) {
     throw RuntimeError(expr.get_name(), "Only instances have properties.");
 }
 
+std::any Interpreter::visit(const Expr::This &expr) {
+    return lookup_var(expr.get_keyword(),expr);
+}
+
 std::any Interpreter::visit(const Expr::Set &expr) {
     std::any object = evaluate(*expr.get_object());
     if (object.type() == typeid(std::shared_ptr<Instance>)) {
