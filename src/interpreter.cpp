@@ -211,13 +211,13 @@ std::any Interpreter::visit(const Expr::Logical &expr)
 
 std::any Interpreter::visit(const Expr::Variable &expr)
 {
-    return environment->get(expr.get_name());
+    return lookup_var(expr.get_name(), expr);
 }
 
 std::any Interpreter::visit(const Expr::Assign &expr)
 {
     std::any value = evaluate(*(expr.get_value()));
-    environment->assign(expr.get_name(), value);
+    assign_var(expr.get_name(), expr, value);
     return value;
 }
 

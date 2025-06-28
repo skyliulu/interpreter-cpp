@@ -46,12 +46,12 @@ void Resolver::resolve(const std::unique_ptr<Expr> &expr)
 std::any Resolver::visit(const Stmt::Expression &expr)
 {
     resolve(*expr.get_expression());
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Stmt::Print &expr)
 {
     resolve(*expr.get_expression());
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Stmt::Var &expr)
 {
@@ -61,14 +61,14 @@ std::any Resolver::visit(const Stmt::Var &expr)
         resolve(*expr.get_initializer());
     }
     define(expr.get_name());
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Stmt::Block &expr)
 {
     beginScope();
     resolve(expr.get_statements());
     endScope();
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Stmt::If &expr)
 {
@@ -78,7 +78,7 @@ std::any Resolver::visit(const Stmt::If &expr)
     {
         resolve(*expr.get_elseBranch());
     }
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Stmt::While &expr)
 {
@@ -87,14 +87,14 @@ std::any Resolver::visit(const Stmt::While &expr)
     resolve(*expr.get_condition());
     resolve(*expr.get_body());
     in_loop = is_in_loop;
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Stmt::Func &expr)
 {
     declare(expr.get_name());
     define(expr.get_name());
     resolve_function(expr, FunctionType::FUNC_TYPE_FUNCTION);
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Stmt::Return &expr)
 {
@@ -111,28 +111,28 @@ std::any Resolver::visit(const Stmt::Return &expr)
         resolve(*expr.get_value());
     }
 
-    return std::any();
+    return {};
 }
 // expr visitor methods
 std::any Resolver::visit(const Expr::Binary &expr)
 {
     resolve(*expr.get_left());
     resolve(*expr.get_right());
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Expr::Unary &expr)
 {
     resolve(*expr.get_right());
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Expr::Literal &expr)
 {
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Expr::Grouping &expr)
 {
     resolve(*expr.get_expression());
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Expr::Variable &expr)
 {
@@ -149,19 +149,19 @@ std::any Resolver::visit(const Expr::Variable &expr)
         }
     }
     resolve_local(expr, expr.get_name(), true);
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Expr::Assign &expr)
 {
     resolve(*expr.get_value());
     resolve_local(expr, expr.get_name(), false);
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Expr::Logical &expr)
 {
     resolve(*expr.get_left());
     resolve(*expr.get_right());
-    return std::any();
+    return {};
 }
 std::any Resolver::visit(const Expr::Call &expr)
 {
@@ -170,7 +170,7 @@ std::any Resolver::visit(const Expr::Call &expr)
     {
         resolve(exp);
     }
-    return std::any();
+    return {};
 }
 void Resolver::beginScope()
 {
@@ -211,7 +211,7 @@ void Resolver::define(Token name)
 }
 void Resolver::resolve_local(const Expr &expr, Token name, bool isRead)
 {
-    for (size_t i = scopes.size() - 1; i >= 0; i--)
+    for (int i = scopes.size() - 1; i >= 0; i--)
     {
         auto it = scopes[i].find(name.get_lexeme());
         if (it != scopes[i].end())
