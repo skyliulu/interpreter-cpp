@@ -16,7 +16,7 @@ public:
 
     int arity() override;
 
-    std::shared_ptr<Callable> bind(Instance instance);
+    std::shared_ptr<Callable> bind(std::shared_ptr<Instance> instance);
 
     std::any call(Interpreter &interpreter, std::vector<std::any> arguments) override;
 
@@ -46,11 +46,11 @@ public:
 
 class Instance {
 private:
-    const Class &clazz;
+    Class &clazz;
     std::unordered_map<std::string, std::any> fields;
 
 public:
-    explicit Instance(const Class &clazz);
+    Instance(Class &clazz);
 
     ~Instance();
 
@@ -60,3 +60,5 @@ public:
 
     std::string to_string() const;
 };
+
+std::any handle_property(const std::shared_ptr<Instance> &instance, std::any property);

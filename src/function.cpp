@@ -14,7 +14,7 @@ int ::Function::arity() {
     return declaration.get_params().size();
 }
 
-std::shared_ptr<Callable> Function::bind(Instance instance) {
+std::shared_ptr<Callable> Function::bind(std::shared_ptr<Instance> instance) {
     std::shared_ptr<Environment> env = std::make_shared<Environment>(enclosing);
     env->define("this", instance);
     return std::make_shared<Function>(declaration, env);
@@ -41,7 +41,7 @@ std::string Function::to_string() const {
 }
 
 ::Class::Class(std::string name,
-               std::unordered_map<std::string, std::shared_ptr<Function> > methods) : name(std::move(name)),
+               std::unordered_map<std::string, std::shared_ptr<Function> > methods) : name(name),
     methods(std::move(methods)) {
 }
 
@@ -70,10 +70,11 @@ std::any Class::call(Interpreter &interpreter, std::vector<std::any> arguments) 
     return instance;
 }
 
-::Instance::Instance(const Class &clazz) : clazz(clazz) {
+::Instance::Instance( Class &clazz) : clazz(clazz) {
 }
 
 ::Instance::~Instance() {
+    // std::cout << "release instance: " << to_string() << std::endl;
 }
 
 void ::Instance::set(const Token &token, const std::any &value) {
@@ -86,7 +87,7 @@ std::any Instance::get(const Token &token) {
     }
     std::shared_ptr<Function> function = clazz.get_method(token.get_lexeme());
     if (function) {
-        return function->bind(*this);
+        return function;
     }
     throw RuntimeError(token, "Undefined property '" + token.get_lexeme() + "'.");
 }
@@ -94,3 +95,12 @@ std::any Instance::get(const Token &token) {
 std::string Instance::to_string() const {
     return clazz.to_string() + " instance";
 }
+
+std::any handle_property(const std::shared_ptr<Instance> &instance, std::any property) {
+    if (property.type() == typeid(std::shared_ptr<Function>)) {
+        const std::shared_ptr<Function> function = std::any_cast<std::shared_ptr<Function>>(property);
+        return function->bind(instance);
+    }
+    return property;
+}
+
